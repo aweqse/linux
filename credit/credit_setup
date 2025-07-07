@@ -1,0 +1,22 @@
+#!/bin/bash
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove
+    
+#SSH
+sudo apt install openssh-server -y
+
+#credit
+sudo apt install pip -y
+pip install selenium --break-system-packages
+sudo apt install /home/aweqse/credit/google-chrome-stable_current_amd64.deb
+pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+#crontab
+crontab /home/aweqse/credit/crontab/credit_crontab
+sudo crontab /home/aweqse/credit/crontab/sudo_credit_crontab
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove 
+

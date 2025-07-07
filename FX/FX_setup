@@ -1,0 +1,20 @@
+#!/bin/bash
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove
+    
+#SSH
+sudo apt install openssh-server -y
+
+#FX
+sudo apt install pip -y
+pip install selenium --break-system-packages
+sudo apt install /home/aweqse/FX/deb/google-chrome-stable_current_amd64.deb
+
+#crontab
+crontab /home/aweqse/FX/crontab/FX_crontab
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove 
+

@@ -1,0 +1,1 @@
+sudo crontab -e で編集する

@@ -1,0 +1,14 @@
+#!/bin/bash
+sudo apt update -y 
+sudo apt upgrade -y 
+sudo apt autoremove -y
+
+#crontabのインポート
+crontab /home/aweqse/NAS/NAS_crontab
+sudo crontab /home/aweqse/NAS/sudo_NAS_crontab
+
+#fstabのインポート
+sudo co /home/aweqse/NAS/conf/fstab /etc/fstab
+
+#set_samba_pass
+sudo smbpasswd -a aweqse

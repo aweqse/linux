@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sudo cp /etc/fstab /home/aweqse/NAS/conf/fstab 

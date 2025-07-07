@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#パッケージの更新
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt autoremove -y
+
+#ファイアーウォールの設定
+sudo ufw allow ssh
+sudo ufw allow 443
+sudo ufw allow 500
+sudo ufw allow 4500
+sudo ufw allow 5555
+sudo ufw enable -y
+
+#インストールと自動起動
+sudo apt-get install softether-vpnserver
+sudo systemctl start softether-vpnserver.service
+sudo systemctl enable softether-vpnserver.service
+
+#サービスに登録するためコンフィグを移動する
+sudo cp /home/aweqse/vpn/conf/vpn_server.config /var/lib/softether/vpn_server.config
+
+#IPアドレスを固定する
+sudo rm /etc/netplan/*
+sudo cp /home/aweqse/vpn/conf/01-netplan.yaml /etc/netplan/01-netplan.yaml
+sudo netplan apply
+
+sudo apt update -y
+sudo apt upgrade -y
+sudo apt autoremove -y

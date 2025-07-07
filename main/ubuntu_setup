@@ -1,0 +1,56 @@
+#!/bin/bash
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove
+
+#pip
+sudo apt install -y python3-pip
+
+#vscode
+sudo apt install /home/aweqse/main/deb/code_1.96.0-1733888194_amd64.deb -y
+    
+#KVM
+sudo apt install -y qemu-kvm libvirt-daemon libvirt-clients bridge-utils virt-manager
+
+#cockpit
+sudo apt install cockpit -y
+sudo apt install cockpit-machines -y
+
+#RDP
+
+
+#SSH
+sudo apt install openssh-server -y
+
+#公開鍵認証の設定
+sudo cp /home/aweqse/main/conf/sshd_config /etc/ssh/
+sudo cat /home/aweqse/main/key/id_ed25519.pub >> /home/aweqse/.ssh/authorized_keys
+sudo cp /home/aweqse/main/key/id_ed25519 /home/aweqse/.ssh/id_ed25519
+sudo chmod 700 /home/aweqse/.ssh
+sudo chmod 777 /home/aweqse/.ssh/id_ed25519
+chown aweqse:aweqse /home/aweqse/.ssh/id_ed25519
+chown -R aweqse:aweqse /home/aweqse/.ssh
+
+#7zip
+sudo apt install p7zip -y
+
+#ubuntuの設定
+#画面ロック無効
+gsettings set org.gnome.desktop.screensaver lock-enabled false
+
+#ipアドレスの設定
+sudo rm /etc/netplan/01-*
+sudo cp /home/aweqse/main/conf/01-netplan-v.yaml /etc/netplan/01-netplan-v.yaml
+sudo netplan apply
+
+#crontabのインポート
+crontab /home/aweqse/main/crontab/main_crontab
+sudo crontab /home/aweqse/main/root_crontab 
+
+
+
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove 
+
