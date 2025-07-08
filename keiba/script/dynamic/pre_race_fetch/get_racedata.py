@@ -103,10 +103,12 @@ def  get_header_data(url_array):
         while len(hearder)!=0:
             #変数の初期化
             racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
-            course_turf=course_dirt=course_jump=0
-            right_handed=left_handed=0
-            course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=0
-
+            course_turf=course_dirt=course_jump=course_other=0
+            right_handed=left_handed=other_handed=0
+            course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=course_type_other=0
+            weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0.
+            baba_good=baba_light_good=baba_light_soft=baba_soft=0
+            old_3age=old_2age=old_3age_over=old_4age_over=0
             # class属性の一覧を取得して変数に格納する
             if len(elements_2)!=0:
                 for elem_2 in elements_2:
@@ -146,7 +148,11 @@ def  get_header_data(url_array):
                     course_jump=1
                     distance=check_1.replace("障","").replace("m","")
                     del hearder[0]
-                    continue   
+                    continue
+                else:
+                    course_other=1
+                    del hearder[0]
+                    continue
                 
             if check_1=="(右)" or check_1=="(左)" or check_1=="(右" or check_1=="(左" :
                 if  check_1=="(右)" or check_1=="(右":
@@ -156,7 +162,11 @@ def  get_header_data(url_array):
                 elif check_1=="(左)" or check_1=="(左":
                     left_handed=1
                     del hearder[0]
-                    continue 
+                    continue
+                else:
+                    other_handed=1
+                    del hearder[0]
+                    continue
 
             if (")" in check_1) or len(check_1)==1:
                 if ("A" in check_1):
@@ -187,7 +197,78 @@ def  get_header_data(url_array):
                     course_type_two=1
                     del hearder[0]
                     continue 
+                else:
+                    course_type_other=1
+                    del hearder[0]
+                    continue 
+            
+            if ("天候:" in check_1):
+                if check_1=="天候:晴":
+                    weather_sunny=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="天候:曇":
+                    weather_cloudy=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="天候:小雨":
+                    weather_light_rain=1
+                    del hearder[0]
+                    continue 
+                elif check_1==":天候:雨":
+                    weather_rain=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="天候:小雪":
+                    weather_cloudy=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="天候:雪":
+                    weather_cloudy=1
+                    del hearder[0]
+                    continue 
+                else:
+                    weather_other=1
+                    del hearder[0]
+                    continue 
 
+            if ("馬場:" in check_1):
+                if check_1=="馬場:良":
+                    baba_good=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="馬場:稍":
+                    baba_light_good=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="馬場:重":
+                    baba_light_soft=1
+                    del hearder[0]
+                    continue                
+                elif check_1=="馬場:不":
+                    baba_soft=1
+                    del hearder[0]
+                    continue 
+
+                if ("サラ系" in check_1):
+                    if check_1=="サラ系３歳":
+                        old_3age=1
+                        del hearder[0]
+                        continue 
+                    elif check_1=="サラ系２歳":
+                        old_2age=1
+                        del hearder[0]
+                        continue 
+                    elif check_1=="サラ系３歳以上":
+                        old_3age_over=1
+                        del hearder[0]
+                        continue 
+                    elif check_1=="サラ系４歳以上":
+                        old_4age_over=1
+                        del hearder[0]
+                        continue 
+                
+                #if 
 
 
 
