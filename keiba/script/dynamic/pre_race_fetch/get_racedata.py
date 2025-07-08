@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
 
-
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
@@ -44,7 +43,7 @@ def  get_header_data(url_array):
     while len(url_array)>load_count:
         header_array=[]
         load_url=url_array[load_count]
-        
+
         #テスト用URL
         #G1
         #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
@@ -63,7 +62,7 @@ def  get_header_data(url_array):
         #jg3
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
         #牝馬
-        load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
+        #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
 
         driver.get(load_url)
 
@@ -348,7 +347,8 @@ def  get_header_data(url_array):
         ]
         header_array.append(header_colmes)
         header_array.append(header_data)
-        return header_array
+        load_count=load_count+1
+    return header_array
 
 def export_csv(header_array):
     path_1="/home/aweqse/est.csv"
