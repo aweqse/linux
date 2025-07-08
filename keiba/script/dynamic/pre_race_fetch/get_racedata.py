@@ -328,22 +328,22 @@ def  get_header_data(url_array):
                     feild_size=check_1.replace("頭","")
                     del hearder[0]
                     continue 
-            header_data=[
-            racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
-            racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
-            course_turf,course_dirt,course_jump,course_other,
-            distance,
-            right_handed,left_handed,other_handed,
-            course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,course_type_other,
-            weather_sunny,weather_cloudy,weather_light_rain,weather_rain,weather_snow,weather_light_snow,weather_other,
-            baba_good,baba_light_good,baba_light_soft,baba_soft,
-            old_3age,old_2age,old_3age_over,old_4age_over,
-            only_hinba,
-            weght_set,weght_level,weght_allowance,weght_handicap,
-            feild_size
-            ]
-            header_array.append(header_colmes,header_data)
-            return header_array
+        header_data=[
+        racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
+        racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
+        course_turf,course_dirt,course_jump,course_other,
+        distance,
+        right_handed,left_handed,other_handed,
+        course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,course_type_other,
+        weather_sunny,weather_cloudy,weather_light_rain,weather_rain,weather_snow,weather_light_snow,weather_other,
+        baba_good,baba_light_good,baba_light_soft,baba_soft,
+        old_3age,old_2age,old_3age_over,old_4age_over,
+        only_hinba,
+        weght_set,weght_level,weght_allowance,weght_handicap,
+        feild_size
+        ]
+        header_array.append(header_colmes,header_data)
+        return header_array
 
 def export_csv(header_array):
     path_1="/home/awewqse/"
