@@ -44,7 +44,8 @@ def  get_header_data(url_array):
     while len(url_array)>load_count:
         header_array=[]
         load_url=url_array[load_count]
-        #テスト用パラメーター
+        
+        #テスト用URL
         #G1
         #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
         #g2
@@ -100,8 +101,7 @@ def  get_header_data(url_array):
         for elem_1 in elements_1:
             hearder=elem_1.text.split()        
 
-        header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","コース:その他","距離","左","右","A","B","C","D","外","内","2周","コース詳細:その他","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数"]
-        #変数の初期化
+        
         racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
         racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
         course_turf=course_dirt=course_jump=course_other=0
@@ -141,7 +141,6 @@ def  get_header_data(url_array):
             if check_1=="/":
                 del hearder[0]
                 continue    
-
 
             if (("芝" in check_1) or ("ダ" in check_1) or ("障" in check_1)) and ("m" in check_1):
                 if ("芝" in check_1):
@@ -205,10 +204,6 @@ def  get_header_data(url_array):
                     continue 
                 elif ("2周" in check_1):
                     course_type_two=1
-                    del hearder[0]
-                    continue 
-                else:
-                    course_type_other=1
                     del hearder[0]
                     continue 
             
@@ -335,14 +330,15 @@ def  get_header_data(url_array):
             
             del hearder[0]
             continue 
-            
+        header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","コース:その他","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数"]
+        #変数の初期化
         header_data=[
         racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
         racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
         course_turf,course_dirt,course_jump,course_other,
         int(distance),
         right_handed,left_handed,other_handed,
-        course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,course_type_other,
+        course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,
         weather_sunny,weather_cloudy,weather_light_rain,weather_rain,weather_snow,weather_light_snow,weather_other,
         baba_good,baba_light_good,baba_light_soft,baba_soft,
         old_3age,old_2age,old_3age_over,old_4age_over,
