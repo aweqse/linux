@@ -35,6 +35,7 @@ def read_csv():
         url="https://race.netkeiba.com/race/shutuba.html?race_id="+str(tmp_1)
         url_array.append(url)
         url_count=url_count+1
+
     return url_array
 
 def  get_header_data(url_array):
@@ -97,12 +98,15 @@ def  get_header_data(url_array):
         for elem_1 in elements_1:
             hearder=elem_1.text.split()
 
-        header_colmes=["G1","G2","G3","L","OP","JG1","JG2","JG3","","","","","","","","","","",]
+        header_colmes=["G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","左","右","A","B","C","D","外","内","2周","","","","","","",""]
 
         while len(hearder)!=0:
             #変数の初期化
             racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
             course_turf=course_dirt=course_jump=0
+            right_handed=left_handed=0
+            course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=0
+
             # class属性の一覧を取得して変数に格納する
             if len(elements_2)!=0:
                 for elem_2 in elements_2:
@@ -122,25 +126,78 @@ def  get_header_data(url_array):
                     racegrade_jg1=1
                 elif grade=="jG2":
                     racegrade_jg2=1
-                elif grade=="jG3":
+                elif grade=="jG3":   
                     racegrade_jg3=1
 
-            check_1=hearder[0]
+            check_1=hearder[0] 
 
             if (("芝" in check_1) or ("ダ" in check_1) or ("障" in check_1)) and ("m" in check_1):
                 if ("芝" in check_1):
                     course_turf=1
-                    distance=check_1.replace("芝","")
+                    distance=check_1.replace("芝","").replace("m","")
                     del hearder[0]
                     continue                           
                 elif ("ダ" in check_1):
                     course_dirt=1
+                    distance=check_1.replace("ダ","").replace("m","")
                     del hearder[0]
                     continue   
                 elif ("障" in check_1):
                     course_jump=1
+                    distance=check_1.replace("障","").replace("m","")
                     del hearder[0]
                     continue   
+                
+            if check_1=="(右)" or check_1=="(左)" or check_1=="(右" or check_1=="(左" :
+                if  check_1=="(右)" or check_1=="(右":
+                    right_handed=1
+                    del hearder[0]
+                    continue   
+                elif check_1=="(左)" or check_1=="(左":
+                    left_handed=1
+                    del hearder[0]
+                    continue 
+
+            if (")" in check_1) or len(check_1)==1:
+                if ("A" in check_1):
+                    course_type_A=1
+                    del hearder[0]
+                    continue 
+                elif ("B" in check_1):
+                    course_type_B=1
+                    del hearder[0]
+                    continue 
+                elif ("C" in check_1):
+                    course_type_C=1
+                    del hearder[0]
+                    continue 
+                elif ("D" in check_1):
+                    course_type_D=1
+                    del hearder[0]
+                    continue 
+                elif ("外" in check_1):
+                    course_type_out=1
+                    del hearder[0]
+                    continue 
+                elif ("内" in check_1):
+                    course_type_in=1
+                    del hearder[0]
+                    continue 
+                elif ("2周" in check_1):
+                    course_type_two=1
+                    del hearder[0]
+                    continue 
+
+
+
+
+
+
+
+
+
+
+                
 
 
             print("dami-")
