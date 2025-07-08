@@ -19,7 +19,8 @@ driver = webdriver.Chrome(options=options)
 
 def main():
     url_array=read_csv()
-    get_header_data(url_array)
+    header_array=get_header_data(url_array)
+    export_csv(header_array)
 
 
 def read_csv():
@@ -41,6 +42,7 @@ def read_csv():
 def  get_header_data(url_array):
     load_count=0
     while len(url_array)>load_count:
+        header_array=[]
         load_url=url_array[load_count]
         #テスト用パラメーター
         #G1
@@ -98,10 +100,11 @@ def  get_header_data(url_array):
         for elem_1 in elements_1:
             hearder=elem_1.text.split()
 
-        header_colmes=["G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","左","右","A","B","C","D","外","内","2周","","","","","","",""]
+        header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","コース:その他","距離","左","右","A","B","C","D","外","内","2周","コース詳細:その他","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数"]
 
         while len(hearder)!=0:
             #変数の初期化
+            racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
             racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
             course_turf=course_dirt=course_jump=course_other=0
             right_handed=left_handed=other_handed=0
@@ -109,6 +112,9 @@ def  get_header_data(url_array):
             weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0.
             baba_good=baba_light_good=baba_light_soft=baba_soft=0
             old_3age=old_2age=old_3age_over=old_4age_over=0
+            only_hinba=0
+            weght_set=weght_level=weght_allowance=weght_handicap=0
+
             # class属性の一覧を取得して変数に格納する
             if len(elements_2)!=0:
                 for elem_2 in elements_2:
@@ -250,38 +256,105 @@ def  get_header_data(url_array):
                     del hearder[0]
                     continue 
 
-                if ("サラ系" in check_1):
-                    if check_1=="サラ系３歳":
-                        old_3age=1
-                        del hearder[0]
-                        continue 
-                    elif check_1=="サラ系２歳":
-                        old_2age=1
-                        del hearder[0]
-                        continue 
-                    elif check_1=="サラ系３歳以上":
-                        old_3age_over=1
-                        del hearder[0]
-                        continue 
-                    elif check_1=="サラ系４歳以上":
-                        old_4age_over=1
-                        del hearder[0]
-                        continue 
+            if ("サラ系" in check_1):
+                if check_1=="サラ系３歳":
+                    old_3age=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="サラ系２歳":
+                    old_2age=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="サラ系３歳以上":
+                    old_3age_over=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="サラ系４歳以上":
+                    old_4age_over=1
+                    del hearder[0]
+                    continue 
                 
-                #if 
+            if (check_1=="新馬") or (check_1=="未勝利") or(check_1=="１勝クラス") or (check_1=="２勝クラス") or (check_1=="３勝クラス")  or (check_1=="オープン") :
+                if check_1=="新馬":
+                    racerank_shinba=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="未勝利":
+                    racerank_nowin=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="１勝クラス":
+                    racerank_1win=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="２勝クラス":
+                    racerank_2win=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="３勝クラス":
+                    racerank_3win=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="オープン":
+                    racerank_open=1
+                    del hearder[0]
+                    continue 
+
+            if ("牝" in check_1):
+                if check_1=="牝" or ("牝(" in check_1):
+                    only_hinba=1
+                    del hearder[0]
+                    continue 
+
+            if (check_1=="馬齢") or (check_1=="定量") or(check_1=="別定") or (check_1=="ハンデ") :
+                if check_1=="馬齢":
+                    weght_set=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="定量":
+                    weght_level=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="別定": 
+                    weght_allowance=1
+                    del hearder[0]
+                    continue 
+                elif check_1=="ハンデ":
+                    weght_handicap=1
+                    del hearder[0]
+                    continue 
+            
+            if ("頭" in check_1) and 2<=len(check_1)<=3:
+                    feild_size=check_1.replace("頭","")
+                    del hearder[0]
+                    continue 
+            header_data=[
+            racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
+            racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
+            course_turf,course_dirt,course_jump,course_other,
+            distance,
+            right_handed,left_handed,other_handed,
+            course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,course_type_other,
+            weather_sunny,weather_cloudy,weather_light_rain,weather_rain,weather_snow,weather_light_snow,weather_other,
+            baba_good,baba_light_good,baba_light_soft,baba_soft,
+            old_3age,old_2age,old_3age_over,old_4age_over,
+            only_hinba,
+            weght_set,weght_level,weght_allowance,weght_handicap,
+            feild_size
+            ]
+            header_array.append(header_colmes,header_data)
+            return header_array
+
+def export_csv(header_array):
+    path_1="/home/awewqse/"
+    df_2=pd.DateFrame(header_array)
+    df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
 
 
 
 
+            
 
-
-
-
-
-                
-
-
-            print("dami-")
 
         
 
