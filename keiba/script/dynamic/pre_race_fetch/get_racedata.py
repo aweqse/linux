@@ -75,9 +75,10 @@ def  get_header_data(url_array):
 
         #本番用コード
         #load_url=url_array[load_count]
-        #テスト用URL
+
+        #テスト用URL,本番時はマスクする
         #G1
-        load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
+        #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
         #g2
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202505021212"
         #g3
@@ -89,11 +90,13 @@ def  get_header_data(url_array):
         #jg1
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202506030711"
         #jg2
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202508020708"
+        load_url="https://race.netkeiba.com/race/result.html?race_id=202508020708"
         #jg3
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
         #牝馬
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
+        url_array=[]
+        url_array.append(load_url)
 
         driver.get(load_url)
 
@@ -112,7 +115,8 @@ def  get_header_data(url_array):
         #webページから情報を取得する
         print(load_url)
         xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
-        xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span"
+        xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
+        
         grade_dict={
             "Icon_GradeType Icon_GradeType1": "G1",
             "Icon_GradeType Icon_GradeType2": "G2",
@@ -287,20 +291,20 @@ def  get_header_data(url_array):
                     del hearder[0]
                     continue 
 
-            if ("サラ系" in check_1):
-                if check_1=="サラ系３歳":
+            if ("3歳" in check_1) or ("2歳" in check_1) or ("3歳以上" in check_1) or ("４歳以上" in check_1):
+                if check_1=="３歳":
                     old_3age=1
                     del hearder[0]
                     continue 
-                elif check_1=="サラ系２歳":
+                elif check_1=="２歳":
                     old_2age=1
                     del hearder[0]
                     continue 
-                elif check_1=="サラ系３歳以上":
+                elif check_1=="３歳以上":
                     old_3age_over=1
                     del hearder[0]
                     continue 
-                elif check_1=="サラ系４歳以上":
+                elif check_1=="４歳以上":
                     old_4age_over=1
                     del hearder[0]
                     continue 
