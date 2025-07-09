@@ -1,4 +1,3 @@
-from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
@@ -98,14 +97,15 @@ def  get_header_data(url_array):
         header_data=[]
         racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
         racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
-        course_turf=course_dirt=course_jump=course_other=0
+        course_turf=course_dirt=course_jump=0
         right_handed=left_handed=other_handed=0
-        course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=course_type_other=0
+        course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=0
         weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0.
         baba_good=baba_light_good=baba_light_soft=baba_soft=0
         old_3age=old_2age=old_3age_over=old_4age_over=0
         only_hinba=0
         weght_set=weght_level=weght_allowance=weght_handicap=0
+        grade=""
 
         #headerを取得
         elements_1 = driver.find_elements(By.XPATH, xpath_1)
@@ -118,6 +118,7 @@ def  get_header_data(url_array):
             class_str = elem_2.get_attribute("class")          
 
         # class属性の一覧を取得して変数に格納する
+
         if len(elements_2)!=0 and (class_str in grade_dict):
             grade=grade_dict[class_str]
         
@@ -330,16 +331,19 @@ def  get_header_data(url_array):
             if ("頭" in check_1) and 2<=len(check_1)<=3:
                     feild_size=check_1.replace("頭","")
                     del hearder[0]
-                    continue 
+                    continue
+            
+            #URLからrace_idを読み取る
+            race_id=int(load_url[-12:])
             
             del hearder[0]
             continue 
-        header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","コース:その他","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数"]
+        header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","レースID"]
         #変数の初期化
         header_data=[
         racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
         racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
-        course_turf,course_dirt,course_jump,course_other,
+        course_turf,course_dirt,course_jump,
         int(distance),
         right_handed,left_handed,other_handed,
         course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,
@@ -348,14 +352,18 @@ def  get_header_data(url_array):
         old_3age,old_2age,old_3age_over,old_4age_over,
         only_hinba,
         weght_set,weght_level,weght_allowance,weght_handicap,
-        int(feild_size)
+        int(feild_size),
+        race_id
         ]
-        
+
         if header_flag==0:
             header_array.append(header_colmes)
             header_flag=1
 
         header_array.append(header_data)
+
+
+
         load_count=load_count+1
         print("ヘッダーの情報格納完了")
     return header_array
