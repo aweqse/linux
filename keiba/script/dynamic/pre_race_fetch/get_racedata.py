@@ -93,16 +93,6 @@ def  get_header_data(url_array):
             "Icon_GradeType Icon_GradeType12": "jG3",
         }
 
-        elements_1 = driver.find_elements(By.XPATH, xpath_1)
-        elements_2 = driver.find_elements(By.XPATH, xpath_2)
-
-        #headerを取得
-        for elem_1 in elements_1:
-            hearder=elem_1.text.split()        
-
-        for elem_2 in elements_2:
-            class_str = elem_2.get_attribute("class")
-            
         #変数の初期化
         header_data=[]
         racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
@@ -116,8 +106,18 @@ def  get_header_data(url_array):
         only_hinba=0
         weght_set=weght_level=weght_allowance=weght_handicap=0
 
+        #headerを取得
+        elements_1 = driver.find_elements(By.XPATH, xpath_1)
+        for elem_1 in elements_1:
+            hearder=elem_1.text.split()        
+
+        #G1,G2等をアイコンのクラスから判別するため取り出す
+        elements_2 = driver.find_elements(By.XPATH, xpath_2)
+        for elem_2 in elements_2:
+            class_str = elem_2.get_attribute("class")          
+
         # class属性の一覧を取得して変数に格納する
-        if len(elements_2)!=0 and (elements_2 not in grade_dict):
+        if len(class_str)!=0 and (class_str not in grade_dict):
             grade=grade_dict[class_str]
         else:
             grade=""
@@ -142,6 +142,7 @@ def  get_header_data(url_array):
         while len(hearder)!=0:
             check_1=hearder[0]
             
+            #要素を変数に格納する処理
             if check_1=="/":
                 del hearder[0]
                 continue    
