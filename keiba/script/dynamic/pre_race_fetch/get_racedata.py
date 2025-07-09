@@ -40,6 +40,7 @@ def read_csv():
 def  get_header_data(url_array):
     load_count=0
     header_array=[]
+    header_flag=0
     while len(url_array)>load_count:
         print("ヘッダーの情報格納開始")
         load_url=url_array[load_count]
@@ -117,10 +118,8 @@ def  get_header_data(url_array):
             class_str = elem_2.get_attribute("class")          
 
         # class属性の一覧を取得して変数に格納する
-        if len(class_str)!=0 and (class_str not in grade_dict):
+        if len(elements_2)!=0 and (class_str in grade_dict):
             grade=grade_dict[class_str]
-        else:
-            grade=""
         
         if grade=="G1":
             racegrade_g1=1
@@ -351,7 +350,11 @@ def  get_header_data(url_array):
         weght_set,weght_level,weght_allowance,weght_handicap,
         int(feild_size)
         ]
-        header_array.append(header_colmes)
+        
+        if header_flag==0:
+            header_array.append(header_colmes)
+            header_flag=1
+
         header_array.append(header_data)
         load_count=load_count+1
         print("ヘッダーの情報格納完了")
