@@ -1,3 +1,4 @@
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
@@ -16,13 +17,42 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    url_array=read_csv()
+    ymd=get_datetime()
+    url_array=read_csv(ymd)
     header_array=get_header_data(url_array)
     export_csv(header_array)
 
+#現在の日にちと曜日を取得する
+def get_datetime():
+    now = datetime.now()
+    day_now=int(now.day)
+    month_now=int(now.month)
+    year_now = now.year
+    weekday_now=now.weekday()
 
-def read_csv():
+    #数字が一桁の場合二けたにする
+    day_now=str(day_now)
+    month_now=str(month_now)
+    if len(day_now)==1:
+        day_now="0"+str(day_now)
+    if len(month_now)==1:
+        month_now="0"+str(month_now)
+    year_now=str(year_now)
+        
+    #NNへの学習を考慮して土曜:0,日曜:1,その他:2という区分けにする
+    if weekday_now==5:
+        weekday_now=0
+    elif weekday_now==6:
+        weekday_now=1
+    else:
+        weekday_now=2
+    ymd=year_now+month_now+day_now
+
+    return ymd
+
+def read_csv(ymd):
     #csvファイルを読み取りレースIDを抽出しURLを生成する
+    path_1="/home/aweqse/working/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
     path_1="/home/aweqse/working/keiba/output/pre_odds_csv/20250705_racetime.csv" #テスト用
     df = pd.read_csv(path_1,index_col=False)
     race_id=df["レースID"]
