@@ -168,17 +168,13 @@ def  get_header_data(url_array):
                     del hearder[0]
                     continue
                 
-            if check_1=="(右)" or check_1=="(左)" or check_1=="(右" or check_1=="(左" :
-                if  check_1=="(右)" or check_1=="(右":
-                    right_handed=1
-                    del hearder[0]
-                    continue   
-                elif check_1=="(左)" or check_1=="(左":
+            if check_1=="札幌" or check_1=="函館" or check_1=="福島" or check_1=="新潟" or check_1=="中山" or check_1=="東京" or check_1=="中京" or check_1=="京都" or  check_1=="阪神"or check_1=="小倉":
+                if  check_1=="新潟" or check_1=="東京"or check_1=="中京":
                     left_handed=1
                     del hearder[0]
-                    continue
-                else:
-                    other_handed=1
+                    continue   
+                else :
+                    right_handed=1
                     del hearder[0]
                     continue
 
