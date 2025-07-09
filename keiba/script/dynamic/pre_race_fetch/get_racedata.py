@@ -27,7 +27,6 @@ def read_csv():
     path_1="/home/aweqse/working/keiba/output/pre_odds_csv/20250705_racetime.csv" #テスト用
     df = pd.read_csv(path_1,index_col=False)
     race_id=df["レースID"]
-    print(race_id)
     url_count=0
     url_array=[]
     while len(race_id)>url_count:
@@ -40,8 +39,9 @@ def read_csv():
 
 def  get_header_data(url_array):
     load_count=0
+    header_array=[]
     while len(url_array)>load_count:
-        header_array=[]
+        print("ヘッダーの情報格納開始")
         load_url=url_array[load_count]
 
         #テスト用URL
@@ -100,7 +100,11 @@ def  get_header_data(url_array):
         for elem_1 in elements_1:
             hearder=elem_1.text.split()        
 
-        
+        for elem_2 in elements_2:
+            class_str = elem_2.get_attribute("class")
+            
+        #変数の初期化
+        header_data=[]
         racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
         racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
         course_turf=course_dirt=course_jump=course_other=0
@@ -113,10 +117,11 @@ def  get_header_data(url_array):
         weght_set=weght_level=weght_allowance=weght_handicap=0
 
         # class属性の一覧を取得して変数に格納する
-        if len(elements_2)!=0:
-            for elem_2 in elements_2:
-                class_str = elem_2.get_attribute("class")
-        grade=grade_dict[class_str]
+        if len(elements_2)!=0 and (elements_2 not in grade_dict):
+            grade=grade_dict[class_str]
+        else:
+            grade=""
+        
         if grade=="G1":
             racegrade_g1=1
         elif grade=="G2":
@@ -348,6 +353,7 @@ def  get_header_data(url_array):
         header_array.append(header_colmes)
         header_array.append(header_data)
         load_count=load_count+1
+        print("ヘッダーの情報格納完了")
     return header_array
 
 def export_csv(header_array):
