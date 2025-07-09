@@ -47,13 +47,13 @@ def get_datetime():
     else:
         weekday_now=2
     ymd=year_now+month_now+day_now
-
     return ymd
 
 def read_csv(ymd):
     #csvファイルを読み取りレースIDを抽出しURLを生成する
     path_1="/home/aweqse/working/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
-    path_1="/home/aweqse/working/keiba/output/pre_odds_csv/20250705_racetime.csv" #テスト用
+    #テスト用
+    path_1="/home/aweqse/working/keiba/output/pre_odds_csv/20250706_racetime.csv" 
     df = pd.read_csv(path_1,index_col=False)
     race_id=df["レースID"]
     url_count=0
@@ -72,11 +72,12 @@ def  get_header_data(url_array):
     header_flag=0
     while len(url_array)>load_count:
         print("ヘッダーの情報格納開始")
-        load_url=url_array[load_count]
 
+        #本番用コード
+        #load_url=url_array[load_count]
         #テスト用URL
         #G1
-        #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
+        load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
         #g2
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202505021212"
         #g3
