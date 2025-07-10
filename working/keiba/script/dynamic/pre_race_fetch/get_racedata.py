@@ -64,7 +64,6 @@ def read_csv(ymd):
         url="https://race.netkeiba.com/race/shutuba.html?race_id="+str(tmp_1)
         url_array.append(url)
         url_count=url_count+1
-
     return url_array
 
 def  get_and_prosees_data(url_array):
@@ -162,7 +161,6 @@ def  get_and_prosees_data(url_array):
             maindata = elem_3.text.split("編集")
 
         # class属性の一覧を取得して変数に格納する
-
         if len(elements_2)!=0 and (class_str in grade_dict):
             grade=grade_dict[class_str]
         
@@ -185,7 +183,6 @@ def  get_and_prosees_data(url_array):
 
         while len(hearder)!=0:
             check_1=hearder[0]
-            
             #要素を変数に格納する処理
             if check_1=="/":
                 del hearder[0]
@@ -205,10 +202,6 @@ def  get_and_prosees_data(url_array):
                 elif ("障" in check_1):
                     course_jump=1
                     distance=check_1.replace("障","").replace("m","")
-                    del hearder[0]
-                    continue
-                else:
-                    course_other=1
                     del hearder[0]
                     continue
                 
@@ -379,7 +372,6 @@ def  get_and_prosees_data(url_array):
                     del hearder[0]
                     continue
             
-
             del hearder[0]
             continue 
 
@@ -415,6 +407,7 @@ def  get_and_prosees_data(url_array):
     #配列を要素に分割する
     maindata_count=0
     after_maindata=[]
+    print("出走馬の情報を取得開始")
     while len(maindata)>maindata_count:
         after_data=maindata[maindata_count]
         after_data = after_data.replace("--", " ").replace("\n", " ").strip().split() #余計な文字を空白に置き換えてまとめて削除して要素に分割する
@@ -441,27 +434,6 @@ def  get_and_prosees_data(url_array):
         after_maindata.append(after_data)
     print(after_maindata)
     
-    #出走馬のデータを取得する
-    while len(maindata)!=0:
-        check_2=maindata[0]
-
-
-    
-    print(maindata)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     driver.quit()
