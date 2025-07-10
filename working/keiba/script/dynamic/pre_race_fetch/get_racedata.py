@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
+import re
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
@@ -51,9 +52,9 @@ def get_datetime():
 
 def read_csv(ymd):
     #csvファイルを読み取りレースIDを抽出しURLを生成する
-    path_1="/home/aweqse/working/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
+    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
     #テスト用
-    path_1="/home/aweqse/working/keiba/output/pre_odds_csv/20250706_racetime.csv" 
+    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250706_racetime.csv" 
     df = pd.read_csv(path_1,index_col=False)
     race_id=df["レースID"]
     url_count=0
@@ -158,7 +159,7 @@ def  get_and_prosees_data(url_array):
         #出走表を取得する
         elements_3 = driver.find_elements(By.XPATH, xpath_3)
         for elem_3 in elements_3:
-            maindata = elem_3.text
+            maindata = elem_3.text.split("編集")
 
         # class属性の一覧を取得して変数に格納する
 
@@ -410,8 +411,43 @@ def  get_and_prosees_data(url_array):
         header_array.append(header_data)
         load_count=load_count+1
         print("ヘッダーの情報格納完了")
+    
+    #配列を要素に分割する
+    maindata_count=0
+    after_maindata=[]
+    while len(maindata)>maindata_count:
+        after_data=maindata[maindata_count]
+        after_data = after_data.replace("--", " ").replace("\n", " ").strip().split() #余計な文字を空白に置き換えてまとめて削除して要素に分割する
+        
+        #配列内のデータを分離させる処理
+        after_data_count=0
+        while len(after_data)>after_data_count:
+            check_2=after_data[after_data_count]
+            if re.match(r"^(栗東|美浦|海外)",check_2):
+                    top=after_data[after_data_count][:2]
+                    end=after_data[after_data_count][2:]
+                    after_data.insert(after_data_count,top)
+                    after_data.insert(after_data_count,end)
+            #if 
+            print(after_data)
 
-    #while 
+
+
+                            
+                    
+
+        print(after_data)
+        maindata_count=maindata_count+1
+        after_maindata.append(after_data)
+    print(after_maindata)
+    
+    #出走馬のデータを取得する
+    while len(maindata)!=0:
+        check_2=maindata[0]
+
+
+    
+    print(maindata)
 
 
 
