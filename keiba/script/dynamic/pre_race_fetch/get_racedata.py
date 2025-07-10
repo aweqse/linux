@@ -19,7 +19,7 @@ driver = webdriver.Chrome(options=options)
 def main():
     ymd=get_datetime()
     url_array=read_csv(ymd)
-    header_array=get_header_data(url_array)
+    header_array=get_and_prosees_data(url_array)
     export_csv(header_array)
 
 #現在の日にちと曜日を取得する
@@ -66,7 +66,7 @@ def read_csv(ymd):
 
     return url_array
 
-def  get_header_data(url_array):
+def  get_and_prosees_data(url_array):
     load_count=0
     header_array=[]
     header_flag=0
@@ -74,7 +74,7 @@ def  get_header_data(url_array):
         print("ヘッダーの情報格納開始")
 
         #本番用コード
-        #load_url=url_array[load_count]
+        load_url=url_array[load_count]
 
         #テスト用URL,本番時はマスクする
         #G1
@@ -90,11 +90,13 @@ def  get_header_data(url_array):
         #jg1
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202506030711"
         #jg2
-        load_url="https://race.netkeiba.com/race/result.html?race_id=202508020708"
+        #load_url="https://race.netkeiba.com/race/result.html?race_id=202508020708"
         #jg3
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
         #牝馬
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
+
+        load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
         url_array=[]
         url_array.append(load_url)
 
@@ -116,6 +118,7 @@ def  get_header_data(url_array):
         print(load_url)
         xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
         xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
+        xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
         
         grade_dict={
             "Icon_GradeType Icon_GradeType1": "G1",
@@ -150,7 +153,12 @@ def  get_header_data(url_array):
         #G1,G2等をアイコンのクラスから判別するため取り出す
         elements_2 = driver.find_elements(By.XPATH, xpath_2)
         for elem_2 in elements_2:
-            class_str = elem_2.get_attribute("class")          
+            class_str = elem_2.get_attribute("class")    
+
+        #出走表を取得する
+        elements_3 = driver.find_elements(By.XPATH, xpath_3)
+        for elem_3 in elements_3:
+            maindata = elem_3.text
 
         # class属性の一覧を取得して変数に格納する
 
@@ -291,7 +299,13 @@ def  get_header_data(url_array):
                     del hearder[0]
                     continue 
 
-            if ("3歳" in check_1) or ("2歳" in check_1) or ("3歳以上" in check_1) or ("４歳以上" in check_1):
+            if ("サラ系" in check_1) or ("障害" in check_1):
+                #年齢条件の判定のため加工する
+                if ("サラ系" in check_1):
+                    check_1=check_1.replace("サラ系","")
+                else:
+                    check_1=check_1.replace("障害","")
+
                 if check_1=="３歳":
                     old_3age=1
                     del hearder[0]
@@ -364,11 +378,13 @@ def  get_header_data(url_array):
                     del hearder[0]
                     continue
             
-            #URLからrace_idを読み取る
-            race_id=int(load_url[-12:])
-            
+
             del hearder[0]
             continue 
+
+        #URLからrace_idを読み取る
+        race_id=int(load_url[-12:])
+            
         header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","レースID"]
         #変数の初期化
         header_data=[
@@ -392,11 +408,27 @@ def  get_header_data(url_array):
             header_flag=1
 
         header_array.append(header_data)
-
-
-
         load_count=load_count+1
         print("ヘッダーの情報格納完了")
+
+    #while 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    driver.quit()
     return header_array
 
 def export_csv(header_array):
