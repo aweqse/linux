@@ -414,29 +414,51 @@ def  get_and_prosees_data(url_array):
         
         #配列内のデータを分離させる処理
         after_data_count=0
-        while len(after_data)>after_data_count:
+        array_len=len(after_data)
+        while array_len>after_data_count:
             check_2=after_data[after_data_count]
-            if re.match(r"^(栗東|美浦|海外)",check_2):
-                    top=after_data[after_data_count][:2]
-                    end=after_data[after_data_count][2:]
-                    after_data.insert(after_data_count,top)
-                    after_data.insert(after_data_count,end)
-            #if 
-            print(after_data)
+            match_1=re.match(r"^([牡牝セ])(\d+)$",check_2)
+            match_2=re.match(r"^(栗東|美浦|海外)(.+)",check_2)
+            match_3=re.match(r"^(\d+)\(([-+]?\d+)\)$",check_2)
+            if match_1:
+                end_1=match_1.group(1)
+                top_1=match_1.group(2)
+                del after_data[after_data_count]
+                after_data.insert(after_data_count,top_1)
+                after_data.insert(after_data_count,end_1)
+                array_len=len(after_data)
 
+            elif match_2:
+                end_2=match_2.group(1)
+                top_2=match_2.group(2)
+                del after_data[after_data_count]
+                after_data.insert(after_data_count,top_2)
+                after_data.insert(after_data_count,end_2)
+                array_len=len(after_data)
 
+            elif match_3:
+                end_3=match_3.group(1)
+                top_3=match_3.group(2)
+                del after_data[after_data_count]
+                after_data.insert(after_data_count,top_3)
+                after_data.insert(after_data_count,end_3)
+                array_len=len(after_data)
 
-                            
-                    
-
-        print(after_data)
+            after_data_count=after_data_count+1
+            array_len=len(after_data)
         maindata_count=maindata_count+1
         after_maindata.append(after_data)
-    print(after_maindata)
+        continue
+    print("要素の分離と配列の格納完了")
     
 
 
+
+
+
+    #chromeを閉じる
     driver.quit()
+    print("情報取得完了!!")
     return header_array
 
 def export_csv(header_array):
