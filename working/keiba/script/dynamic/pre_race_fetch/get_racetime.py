@@ -5,7 +5,6 @@ from time import sleep
 import re
 import csv
 
-
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
@@ -17,6 +16,18 @@ options.add_argument('--ignore-certificate-errors')
 options.add_argument('--no-sandbox')
 
 driver = webdriver.Chrome(options=options)
+
+
+
+
+
+
+
+#カテゴリ変数のものはone-hot化すること！！
+
+
+
+
 
 def main():
     datetime_array,ymd=get_datetime()
