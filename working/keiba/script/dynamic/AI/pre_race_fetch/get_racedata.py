@@ -381,6 +381,7 @@ def  get_and_prosees_data(url_array):
         header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","レースID"]
         #変数の初期化
         header_data=[
+        race_id,
         racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
         racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
         course_turf,course_dirt,course_jump,
@@ -392,8 +393,7 @@ def  get_and_prosees_data(url_array):
         old_3age,old_2age,old_3age_over,old_4age_over,
         only_hinba,
         weght_set,weght_level,weght_allowance,weght_handicap,
-        int(feild_size),
-        race_id
+        int(feild_size)
         ]
 
         if header_flag==0:
