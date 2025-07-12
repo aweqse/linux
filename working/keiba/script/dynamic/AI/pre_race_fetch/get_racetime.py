@@ -17,18 +17,6 @@ options.add_argument('--no-sandbox')
 
 driver = webdriver.Chrome(options=options)
 
-
-
-
-
-
-
-#カテゴリ変数のものはone-hot化すること！！
-
-
-
-
-
 def main():
     datetime_array,ymd=get_datetime()
     load_url,day, month, year, week_now =get_url(datetime_array)
@@ -120,7 +108,7 @@ def process_date(starttime_array,match_check_word,day, month, year, week_now ):
     alltime_array=[]
     
     #繰り返し条件のTrueは仮
-    head=["年","月","日","曜日","回","日目","競馬場","発送時刻30分前","発送時刻10分前","発送時刻5分前","発送時刻","レースID",]
+    head=["年","月","日","回","日目","発送時刻30分前","発送時刻10分前","発送時刻5分前","発送時刻","レースID",]
     alltime_array.append(head)
     while len(starttime_array)>split_count:
         check_2=starttime_array[split_count]
