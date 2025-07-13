@@ -7,7 +7,7 @@ import re
 from selenium.webdriver.support.ui import Select
 
 options = webdriver.ChromeOptions()
-#options.add_argument("--headless=new")
+options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-running-insecure-content')
