@@ -4,9 +4,10 @@ import pandas as pd
 from time import sleep
 from selenium.webdriver.common.by import By
 import re
+from selenium.webdriver.support.ui import Select
 
 options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
+#options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-running-insecure-content')
@@ -136,8 +137,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             xpath_umaren=      "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
             xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
             xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            xpath_prudown=     "/html/body/div[1]/div[3]/div[2]/div[1]/div[2]/div/select"
 
             #単勝・複勝のオッズを取得する
+            print("単勝・複勝の情報取得開始")
             driver.get(load_url_win)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
@@ -153,12 +156,108 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #要素を変数に格納する
             elements_win = driver.find_elements(By.XPATH, xpath_win)
             
-            #現在の時刻を取得する
+            #単勝の取得時刻を取得する
             now = datetime.now()
             hour = now.hour
             minute = now.minute
             win_time=hour*60+minute 
+            print("単勝・複勝の情報取得完了")
 
+
+
+            #馬連の要素を取得する
+            print("馬連の情報取得開始")
+            driver.get(load_url_umaren)
+            page_state=driver.execute_script("return document.readyState")
+            sleep(5)
+            while page_state=="complete":
+                print("url読み込み完了")
+                break
+            else:
+                print("URLの読み込みに失敗したため再読み込みします。")
+                driver.get(load_url_umaren)
+                sleep(10)
+                page_state=driver.execute_script("return document.readyState")
+            
+            #要素を変数に格納する
+            elements_umaren = driver.find_elements(By.XPATH, xpath_umaren)
+            
+            #馬連の取得時効を取得する
+            now = datetime.now()
+            hour = now.hour
+            minute = now.minute
+            umaren_time=hour*60+minute 
+            print("馬連の情報取得終了")
+
+
+
+            #ワイドの要素を取得する
+            print("ワイドの情報取得開始")
+            driver.get(load_url_wide)
+            page_state=driver.execute_script("return document.readyState")
+            sleep(5)
+            while page_state=="complete":
+                print("url読み込み完了")
+                break
+            else:
+                print("URLの読み込みに失敗したため再読み込みします。")
+                driver.get(load_url_wide)
+                sleep(10)
+                page_state=driver.execute_script("return document.readyState")
+            
+            #要素を変数に格納する
+            elements_wide = driver.find_elements(By.XPATH, xpath_wide)
+
+            #現在の時刻を取得する
+            now = datetime.now()
+            hour = now.hour
+            minute = now.minute
+            wide_time=hour*60+minute
+            print("ワイドの情報取得完了") 
+
+
+
+            print("三連複の情報取得開始")
+            driver.get(load_url_sanrenpuku)
+            page_state=driver.execute_script("return document.readyState")
+            sleep(5)
+            while page_state=="complete":
+                print("url読み込み完了")
+                break
+            else:
+                print("URLの読み込みに失敗したため再読み込みします。")
+                driver.get(load_url_sanrenpuku)
+                sleep(10)
+                page_state=driver.execute_script("return document.readyState")
+            
+            #要素を変数に格納する
+            elements_sanrenpuku_1 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+
+            #プルダウンを操作して101~200を取得する
+            select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
+            select = Select(select_elem)
+            select.select_by_index(2)
+            
+            elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+            
+            #正常に取り出せるかのテスト
+            for elem_5 in elements_sanrenpuku_2:
+                sanrenpuku_ele_2=elem_5.text.replace("\n"," ")
+            print(sanrenpuku_ele_2)
+
+            #現在の時刻を取得する
+            now = datetime.now()
+            hour = now.hour
+            minute = now.minute
+            sanrenpuku_time=hour*60+minute 
+            print("三連複の情報取得開始")
+
+
+
+
+
+            #単勝,複勝の情報を加工する
+            print("単勝の処理開始")
             for elem_1 in elements_win:
                 win_ele=elem_1.text.replace("\n","")
 
@@ -208,33 +307,13 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             path_2="/home/aweqse/"+ymd+"_win_place_odds.csv"
             df_2=pd.DataFrame(win_export_array)
             df_2.to_csv(path_2, index=False, header=False, encoding='utf-8-sig')           
-                
+            print("単勝の処理完了")
                 
 
-            #馬連の要素を取得する
+
+
+            #馬連の情報を加工する
             print("馬連の処理開始")
-            driver.get(load_url_umaren)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            while page_state=="complete":
-                print("url読み込み完了")
-                break
-            else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_umaren)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
-            
-            #要素を変数に格納する
-            elements_umaren = driver.find_elements(By.XPATH, xpath_umaren)
-            
-            #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            umaren_time=hour*60+minute 
-
-            #配列を整形する
             for elem_2 in elements_umaren:
                 umaren_ele=elem_2.text.replace("\n"," ")
             umaren_match=r"(\d+)\s(\d+)\s(\d+)\s(\d+\.\d)\s\d+\s[^\s]+\s\d+\s[^\s]+"
@@ -244,7 +323,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             umaren_ele=umaren_ele[:30]
 
             #配列から要素を変数に格納する
-            type_wide=type_sanrenpuku=umaban_3=min_odds=max_odds=0
+            type_wide=type_sanrenpuku=type_umaren=0
             type_umaren=1
             cache_2_array=[]
             umaren_export_array=[]
@@ -255,9 +334,11 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 umaren_odds_rank=check_2[0]
                 umaban_1=check_2[1]
                 umaban_2=check_2[2]
-                umaban_3=0
+                umaban_3=-1
                 umarenn_odds=check_2[3]
-                
+                min_odds=-1
+                max_odds=-1
+
                 #レースidを取り出す
                 race_id_umaren_match=r"(\d{12})"
                 match=re.search(race_id_umaren_match,load_url_umaren)
@@ -273,15 +354,16 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                     before_5min_flg=1  
 
                 header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","最低オッズ","最大オッズ","人気","取得時間"]
-                cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,float(umarenn_odds),min_odds,max_odds,int(umaren_odds_rank),umaren_time]
+                cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),int(umaban_3),before_30min_flg,before_10min_flg,before_5min_flg,float(umarenn_odds),float(min_odds),float(max_odds),int(umaren_odds_rank),umaren_time]
                 
                 if header_flg==0:
                     umaren_export_array.append(header_2)
                     header_flg=1
                 umaren_export_array.append(cache_2_array)
                 umaren_count=umaren_count+1
-                        #csvに出力する
-            path_3="/home/aweqse/"+ymd+"_umaren_odds.csv"
+            
+            #csvに出力する
+            path_3="/home/aweqse/"+race_id_umaren+"_umaren_odds.csv"
             df_3=pd.DataFrame(umaren_export_array)
             df_3.to_csv(path_3, index=False, header=False, encoding='utf-8-sig') 
             print("馬連の処理終了")
@@ -289,33 +371,11 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
 
 
-            #ワイドの要素を取得する
-            print("ワイドの処理開始")
-            driver.get(load_url_wide)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            while page_state=="complete":
-                print("url読み込み完了")
-                break
-            else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_wide)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
             
-            #要素を変数に格納する
-            elements_wide = driver.find_elements(By.XPATH, xpath_wide)
-
-            #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            wide_time=hour*60+minute 
-
             #配列を整形する
+            print("ワイドの処理開始")
             for elem_3 in elements_wide:
                 wide_ele=elem_3.text.replace("\n"," ")
-            print(repr(wide_ele))
             wide_match = wide_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+\d+\s+[^\s]+\s+\d+\s+[^\s]+"
             wide_ele=re.findall(wide_match,wide_ele)
 
@@ -323,7 +383,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             wide_ele=wide_ele[:30]
 
             #配列から要素を変数に格納する
-            type_wide=type_sanrenpuku=umaban_3=0
+            type_umaren=type_wide=type_sanrenpuku=0
             type_wide=1
             cache_3_array=[]
             wide_export_array=[]
@@ -334,8 +394,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 wide_odds_rank=check_3[0]
                 umaban_1=check_3[1]
                 umaban_2=check_3[2]
-                umaban_3=0
-                wide_odds=0
+                umaban_3=-1
+                wide_odds=-1
                 min_odds=check_3[3]
                 max_odds=check_3[4]
                 
@@ -360,59 +420,42 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                     header_flg=1
                 wide_export_array.append(cache_3_array)
                 wide_count=wide_count+1
+
             #csvに出力する
-            path_4="/home/aweqse/"+ymd+"_wide_odds.csv"
+            path_4="/home/aweqse/"+race_id_wide+"_wide_odds.csv"
             df_3=pd.DataFrame(wide_export_array)
             df_3.to_csv(path_4, index=False, header=False, encoding='utf-8-sig') 
             print("ワイドの処理終了")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             #三連複の要素を取得する
-            driver.get(load_url_sanrenpuku)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            while page_state=="complete":
-                print("url読み込み完了")
-                break
-            else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_sanrenpuku)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
-            
-            #要素を変数に格納する
-            elements_sanrenpuku = driver.find_elements(By.XPATH, xpath_sanrenpuku)
 
-            #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            sanrenpuku_time=hour*60+minute 
 
-                
+            #配列を整形する(1~100)
+            for elem_4 in elements_sanrenpuku_1:
+                sanrenpuku_ele=elem_4.text.replace("\n"," ")
+            sanrenpuku_match = sanrenpuku_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)"
+            sanrenpuku_ele=re.findall(sanrenpuku_match,sanrenpuku_ele)                
             
-            
+
+
+            #配列から要素を変数に格納する(1~100)
+            type_umaren=type_wide=type_wide=0
+            type_sanrenpuku=1
+            cache_4_array=[]
+            sanrenpuku_export_array=[]
+            header_flg=0
+            sanrenpuku_count=0
+            while len(sanrenpuku_ele)>sanrenpuku_count:
+                check_4=wide_ele[wide_count]
+                wide_odds_rank=check_4[0]
+                umaban_1=check_4[1]
+                umaban_2=check_4[2]
+                umaban_3=check_4[3]
+                sanrenpuku_odds=[4]
+                min_odds=-1
+                max_odds=-1           
             
             
             
