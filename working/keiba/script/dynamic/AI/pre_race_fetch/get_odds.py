@@ -196,7 +196,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                     before_5min_flg=1       
                 
                 #配列に格納する
-                header_1=["レースID","馬番","30分前","10分前","5分前","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
+                header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
                 cache_1_array=[int(race_id),before_30min_flg,before_10min_flg,before_5min_flg,int(umaban),float(odds_win),float(min_odds_place),float(max_odds_place),int(odds_rank),win_time]
                 if header_flg==0:
                     win_export_array.append(header_1)
@@ -212,6 +212,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 
 
             #馬連の要素を取得する
+            print("馬連の処理開始")
             driver.get(load_url_umaren)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
@@ -243,7 +244,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             umaren_ele=umaren_ele[:30]
 
             #配列から要素を変数に格納する
-            type_wide=type_sanrenpuku=umaban_3=0
+            type_wide=type_sanrenpuku=umaban_3=min_odds=max_odds=0
             type_umaren=1
             cache_2_array=[]
             umaren_export_array=[]
@@ -258,8 +259,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 umarenn_odds=check_2[3]
                 
                 #レースidを取り出す
-                umaren_match=r"(\d{12})"
-                match=re.search(umaren_match,load_url_umaren)
+                race_id_umaren_match=r"(\d{12})"
+                match=re.search(race_id_umaren_match,load_url_umaren)
                 race_id_umaren=match.group(1)
 
                 #取得した時刻を判定する
@@ -271,8 +272,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 else:
                     before_5min_flg=1  
 
-                header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","人気","取得時間"]
-                cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,umaban_1,umaban_2,umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,umarenn_odds,umaren_odds_rank,umaren_time]
+                header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","最低オッズ","最大オッズ","人気","取得時間"]
+                cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,float(umarenn_odds),min_odds,max_odds,int(umaren_odds_rank),umaren_time]
                 
                 if header_flg==0:
                     umaren_export_array.append(header_2)
@@ -283,35 +284,13 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             path_3="/home/aweqse/"+ymd+"_umaren_odds.csv"
             df_3=pd.DataFrame(umaren_export_array)
             df_3.to_csv(path_3, index=False, header=False, encoding='utf-8-sig') 
-                
-
-
-
-
-            print(umaren_ele)
-
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            print("馬連の処理終了")
 
 
 
 
             #ワイドの要素を取得する
+            print("ワイドの処理開始")
             driver.get(load_url_wide)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
@@ -332,6 +311,80 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             hour = now.hour
             minute = now.minute
             wide_time=hour*60+minute 
+
+            #配列を整形する
+            for elem_3 in elements_wide:
+                wide_ele=elem_3.text.replace("\n"," ")
+            print(repr(wide_ele))
+            wide_match = wide_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+\d+\s+[^\s]+\s+\d+\s+[^\s]+"
+            wide_ele=re.findall(wide_match,wide_ele)
+
+            #30番以降の配列を削除する
+            wide_ele=wide_ele[:30]
+
+            #配列から要素を変数に格納する
+            type_wide=type_sanrenpuku=umaban_3=0
+            type_wide=1
+            cache_3_array=[]
+            wide_export_array=[]
+            header_flg=0
+            wide_count=0
+            while len(wide_ele)>wide_count:
+                check_3=wide_ele[wide_count]
+                wide_odds_rank=check_3[0]
+                umaban_1=check_3[1]
+                umaban_2=check_3[2]
+                umaban_3=0
+                wide_odds=0
+                min_odds=check_3[3]
+                max_odds=check_3[4]
+                
+                #レースidを取り出す
+                wide_match=r"(\d{12})"
+                match=re.search(wide_match,load_url_wide)
+                race_id_wide=match.group(1)
+
+                #取得した時刻を判定する
+                before_30min_flg=before_10min_flg=before_5min_flg=0
+                if (hour_min in before_30min_array):
+                    before_30min_flg=1
+                elif (hour_min in before_10min_array):
+                    before_10min_flg=1
+                else:
+                    before_5min_flg=1  
+
+                cache_3_array=[int(race_id_wide),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,wide_odds,float(min_odds),float(max_odds),int(wide_odds_rank),wide_time]
+                
+                if header_flg==0:
+                    wide_export_array.append(header_2)
+                    header_flg=1
+                wide_export_array.append(cache_3_array)
+                wide_count=wide_count+1
+            #csvに出力する
+            path_4="/home/aweqse/"+ymd+"_wide_odds.csv"
+            df_3=pd.DataFrame(wide_export_array)
+            df_3.to_csv(path_4, index=False, header=False, encoding='utf-8-sig') 
+            print("ワイドの処理終了")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
