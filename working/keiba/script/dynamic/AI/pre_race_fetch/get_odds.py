@@ -284,11 +284,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 else:
                     before_5min_flg=1  
 
-                header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","最低オッズ","最大オッズ","人気","取得時間"]
                 cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),int(umaban_3),before_30min_flg,before_10min_flg,before_5min_flg,float(umarenn_odds),float(min_odds),float(max_odds),int(umaren_odds_rank),umaren_time]
                 
                 if header_flg==0:
-                    umaren_export_array.append(header_2)
+                    umaren_export_array.append(header_1)
                     header_flg=1
                 umaren_export_array.append(cache_2_array)
                 umaren_count=umaren_count+1
@@ -370,7 +369,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 cache_3_array=[int(race_id_wide),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,wide_odds,float(min_odds),float(max_odds),int(wide_odds_rank),wide_time]
                 
                 if header_flg==0:
-                    wide_export_array.append(header_2)
+                    wide_export_array.append(header_1)
                     header_flg=1
                 wide_export_array.append(cache_3_array)
                 wide_count=wide_count+1
