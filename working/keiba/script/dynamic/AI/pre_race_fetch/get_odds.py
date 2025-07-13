@@ -160,100 +160,9 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             now = datetime.now()
             hour = now.hour
             minute = now.minute
-            win_time=hour*60+minute 
+            win_time=hour*60+minute
             print("単勝・複勝の情報取得完了")
-
-
-
-            #馬連の要素を取得する
-            print("馬連の情報取得開始")
-            driver.get(load_url_umaren)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            while page_state=="complete":
-                print("url読み込み完了")
-                break
-            else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_umaren)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
             
-            #要素を変数に格納する
-            elements_umaren = driver.find_elements(By.XPATH, xpath_umaren)
-            
-            #馬連の取得時効を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            umaren_time=hour*60+minute 
-            print("馬連の情報取得終了")
-
-
-
-            #ワイドの要素を取得する
-            print("ワイドの情報取得開始")
-            driver.get(load_url_wide)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            while page_state=="complete":
-                print("url読み込み完了")
-                break
-            else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_wide)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
-            
-            #要素を変数に格納する
-            elements_wide = driver.find_elements(By.XPATH, xpath_wide)
-
-            #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            wide_time=hour*60+minute
-            print("ワイドの情報取得完了") 
-
-
-
-            print("三連複の情報取得開始")
-            driver.get(load_url_sanrenpuku)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            while page_state=="complete":
-                print("url読み込み完了")
-                break
-            else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_sanrenpuku)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
-            
-            #要素を変数に格納する
-            elements_sanrenpuku_1 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
-
-            #プルダウンを操作して101~200を取得する
-            print("101~200までの要素を取得")
-            select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
-            select = Select(select_elem)
-            select.select_by_index(2)
-            sleep(5)
-            elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
-            
-            #
-
-            #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            sanrenpuku_time=hour*60+minute 
-            print("三連複の情報取得開始")
-
-
-
-
-
             #単勝,複勝の情報を加工する
             print("単勝の処理開始")
             for elem_1 in elements_win:
@@ -309,6 +218,30 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 
 
 
+
+            #馬連の要素を取得する
+            print("馬連の情報取得開始")
+            driver.get(load_url_umaren)
+            page_state=driver.execute_script("return document.readyState")
+            sleep(5)
+            while page_state=="complete":
+                print("url読み込み完了")
+                break
+            else:
+                print("URLの読み込みに失敗したため再読み込みします。")
+                driver.get(load_url_umaren)
+                sleep(10)
+                page_state=driver.execute_script("return document.readyState")
+            
+            #要素を変数に格納する
+            elements_umaren = driver.find_elements(By.XPATH, xpath_umaren)
+            
+            #馬連の取得時効を取得する
+            now = datetime.now()
+            hour = now.hour
+            minute = now.minute
+            umaren_time=hour*60+minute 
+            print("馬連の情報取得終了")
 
             #馬連の情報を加工する
             print("馬連の処理開始")
@@ -369,7 +302,30 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
 
 
+            #ワイドの要素を取得する
+            print("ワイドの情報取得開始")
+            driver.get(load_url_wide)
+            page_state=driver.execute_script("return document.readyState")
+            sleep(5)
+            while page_state=="complete":
+                print("url読み込み完了")
+                break
+            else:
+                print("URLの読み込みに失敗したため再読み込みします。")
+                driver.get(load_url_wide)
+                sleep(10)
+                page_state=driver.execute_script("return document.readyState")
             
+            #要素を変数に格納する
+            elements_wide = driver.find_elements(By.XPATH, xpath_wide)
+
+            #現在の時刻を取得する
+            now = datetime.now()
+            hour = now.hour
+            minute = now.minute
+            wide_time=hour*60+minute
+            print("ワイドの情報取得完了") 
+
             #配列を整形する
             print("ワイドの処理開始")
             for elem_3 in elements_wide:
@@ -426,9 +382,40 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("ワイドの処理終了")
 
 
+
+            print("三連複の情報取得開始")
+            driver.get(load_url_sanrenpuku)
+            page_state=driver.execute_script("return document.readyState")
+            sleep(5)
+            while page_state=="complete":
+                print("url読み込み完了")
+                break
+            else:
+                print("URLの読み込みに失敗したため再読み込みします。")
+                driver.get(load_url_sanrenpuku)
+                sleep(10)
+                page_state=driver.execute_script("return document.readyState")
             
-            print("三連複の処理開始")
+            #要素を変数に格納する
+            elements_sanrenpuku_1 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+
+            #プルダウンを操作して101~200を取得する
+            print("101~200までの要素を取得")
+            select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
+            select = Select(select_elem)
+            select.select_by_index(2)
+            sleep(5)
+            elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+
+            #現在の時刻を取得する
+            now = datetime.now()
+            hour = now.hour
+            minute = now.minute
+            sanrenpuku_time=hour*60+minute 
+            print("三連複の情報取得終了")    
+            
             #三連複の要素を取得する
+            print("三連複の処理開始")
             #配列を整形する(1~100)
             for elem_4 in elements_sanrenpuku_1:
                 sanrenpuku_ele_1=elem_4.text.replace("\n"," ")
@@ -501,11 +488,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
         continue 
 
     print("競馬の終了時刻となったので待機を終了します")
-
-
-    #hour=
-    #while 
-
 
 main()
 
