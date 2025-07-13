@@ -18,9 +18,9 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    ymd=get_datetime
-    win_array,umaren_array,wide_1array,sanrenpuku_array=read_csv(ymd)
-    get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array)
+    ymd=get_datetime()
+    win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min=read_csv(ymd)
+    get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,ymd)
 
 def get_datetime():
     now = datetime.now()
@@ -102,9 +102,9 @@ def read_csv(ymd):
     umaren_array = {**before_30min_umaren, **before_10min_umaren,**before_5min_umaren}
     wide_1array = {**before_30min_wide, **before_10min_wide,**before_5min_wide}
     sanrenpuku_array = {**before_30min_sanrenpuku, **before_10min_sanrenpuku,**before_5min_sanrenpuku}
-    return win_array,umaren_array,wide_1array,sanrenpuku_array
+    return win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min
 
-def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array):
+def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,ymd):
     #時刻を取得する
     now = datetime.now()
     hour = now.hour
@@ -161,26 +161,55 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array):
 
             for elem_1 in elements_win:
                 win_ele=elem_1.text.replace("\n","")
-            print(win_ele)
+
             #配列の加工
             split_match=r"(\d+)\s(\d+)\s(\d+)([^\d\s]+)\s(\d+\.\d)\s(\d+\.\d)\s*-\s*(\d+\.\d)"
             win_ele=re.findall(split_match,win_ele)
-            odds_rank=win_ele.group(1)
-            gate_number=win_ele.group(2)
-            horse_number=win_ele.group(3)
-            horse_name=win_ele.group(4)
-            odds=win_ele.group(5)
-            min_place=win_ele.group(6)
-            max_place=win_ele.group(7)
+            win_count=0
 
-            print(horse_name)
+            #変数の初期化
+            win_export_array=[]
+            cache_1_array=[]
+            header_flg=0
+            while len(win_ele)>win_count:
+                check_1=win_ele[win_count]
+                odds_rank=check_1[0]
+                umaban=check_1[2]
+                odds_win=check_1[4]
+                min_odds_place=check_1[5]
+                max_odds_place=check_1[6]
+                
+                #いつの時間の情報なのか判断するために配列の中身を乗り出して判定する
+                before_30min_array=before_30min.tolist()
+                before_10min_array=before_10min.tolist()
+                
+                win_match=r"(\d+)$"
+                match=re.search(win_match,load_url_win)
+                race_id=match.group(1)
 
-
-
-
-
-
-
+                before_30min_flg=before_10min_flg=before_5min_flg=0
+                if (hour_min in before_30min_array):
+                    before_30min_flg=1
+                elif (hour_min in before_10min_array):
+                    before_10min_flg=1
+                else:
+                    before_5min_flg=1       
+                
+                #配列に格納する
+                header_1=["レースID","馬番","30分前","10分前","5分前","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
+                cache_1_array=[int(race_id),before_30min_flg,before_10min_flg,before_5min_flg,int(umaban),float(odds_win),float(min_odds_place),float(max_odds_place),int(odds_rank),win_time]
+                if header_flg==0:
+                    win_export_array.append(header_1)
+                    header_flg=1
+                win_export_array.append(cache_1_array)
+                win_count=win_count+1
+            
+            #csvに出力する
+            path_2="/home/aweqse/"+ymd+"_win_place_odds.csv"
+            df_2=pd.DataFrame(win_export_array)
+            df_2.to_csv(path_2, index=False, header=False, encoding='utf-8-sig')           
+                
+                
 
             #馬連の要素を取得する
             driver.get(load_url_umaren)
@@ -203,6 +232,82 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array):
             hour = now.hour
             minute = now.minute
             umaren_time=hour*60+minute 
+
+            #配列を整形する
+            for elem_2 in elements_umaren:
+                umaren_ele=elem_2.text.replace("\n"," ")
+            umaren_match=r"(\d+)\s(\d+)\s(\d+)\s(\d+\.\d)\s\d+\s[^\s]+\s\d+\s[^\s]+"
+            umaren_ele=re.findall(umaren_match,umaren_ele)
+
+            #30番以降の配列を削除する
+            umaren_ele=umaren_ele[:30]
+
+            #配列から要素を変数に格納する
+            type_wide=type_sanrenpuku=umaban_3=0
+            type_umaren=1
+            cache_2_array=[]
+            umaren_export_array=[]
+            header_flg=0
+            umaren_count=0
+            while len(umaren_ele)>umaren_count:
+                check_2=umaren_ele[umaren_count]
+                umaren_odds_rank=check_2[0]
+                umaban_1=check_2[1]
+                umaban_2=check_2[2]
+                umaban_3=0
+                umarenn_odds=check_2[3]
+                
+                #レースidを取り出す
+                umaren_match=r"(\d{12})"
+                match=re.search(umaren_match,load_url_umaren)
+                race_id_umaren=match.group(1)
+
+                #取得した時刻を判定する
+                before_30min_flg=before_10min_flg=before_5min_flg=0
+                if (hour_min in before_30min_array):
+                    before_30min_flg=1
+                elif (hour_min in before_10min_array):
+                    before_10min_flg=1
+                else:
+                    before_5min_flg=1  
+
+                header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","人気","取得時間"]
+                cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,umaban_1,umaban_2,umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,umarenn_odds,umaren_odds_rank,umaren_time]
+                
+                if header_flg==0:
+                    umaren_export_array.append(header_2)
+                    header_flg=1
+                umaren_export_array.append(cache_2_array)
+                umaren_count=umaren_count+1
+                        #csvに出力する
+            path_3="/home/aweqse/"+ymd+"_umaren_odds.csv"
+            df_3=pd.DataFrame(umaren_export_array)
+            df_3.to_csv(path_3, index=False, header=False, encoding='utf-8-sig') 
+                
+
+
+
+
+            print(umaren_ele)
+
+            
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
