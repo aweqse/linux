@@ -234,16 +234,14 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_sanrenpuku_1 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
 
             #プルダウンを操作して101~200を取得する
+            print("101~200までの要素を取得")
             select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
             select = Select(select_elem)
             select.select_by_index(2)
-            
+            sleep(5)
             elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
             
-            #正常に取り出せるかのテスト
-            for elem_5 in elements_sanrenpuku_2:
-                sanrenpuku_ele_2=elem_5.text.replace("\n"," ")
-            print(sanrenpuku_ele_2)
+            #
 
             #現在の時刻を取得する
             now = datetime.now()
@@ -428,50 +426,71 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("ワイドの処理終了")
 
 
-
+            
+            print("三連複の処理開始")
             #三連複の要素を取得する
-
-
             #配列を整形する(1~100)
             for elem_4 in elements_sanrenpuku_1:
-                sanrenpuku_ele=elem_4.text.replace("\n"," ")
+                sanrenpuku_ele_1=elem_4.text.replace("\n"," ")
             sanrenpuku_match = sanrenpuku_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)"
-            sanrenpuku_ele=re.findall(sanrenpuku_match,sanrenpuku_ele)                
-            
+            sanrenpuku_ele_1=re.findall(sanrenpuku_match,sanrenpuku_ele_1)    
 
+            #配列を整形する(101~200)
+            for elem_5 in elements_sanrenpuku_2:
+                sanrenpuku_ele_2=elem_5.text.replace("\n"," ")
+            sanrenpuku_match = sanrenpuku_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)"
+            sanrenpuku_ele_2=re.findall(sanrenpuku_match,sanrenpuku_ele_2)
+
+            sanrenpuku_ele_2=sanrenpuku_ele_2[:50]         
+
+            #同一の処理をするため配列を統合する
+            sanrenpuku_array=sanrenpuku_ele_1+sanrenpuku_ele_2
 
             #配列から要素を変数に格納する(1~100)
-            type_umaren=type_wide=type_wide=0
+            type_umaren=type_wide==0
             type_sanrenpuku=1
             cache_4_array=[]
             sanrenpuku_export_array=[]
             header_flg=0
             sanrenpuku_count=0
-            while len(sanrenpuku_ele)>sanrenpuku_count:
+
+            while len(sanrenpuku_array)>sanrenpuku_count:
                 check_4=wide_ele[wide_count]
-                wide_odds_rank=check_4[0]
+                sanrenpuku_odds_rank=check_4[0]
                 umaban_1=check_4[1]
                 umaban_2=check_4[2]
                 umaban_3=check_4[3]
                 sanrenpuku_odds=[4]
                 min_odds=-1
-                max_odds=-1           
+                max_odds=-1
             
-            
-            
-            
-            
-            
-            print("ダミー")
+                #レースidを取り出す
+                sanrenpuku_match=r"(\d{12})"
+                match=re.search(sanrenpuku_match,load_url_sanrenpuku)
+                race_id_sanrenpuku=match.group(1)
 
+                #取得した時刻を判定する
+                before_30min_flg=before_10min_flg=before_5min_flg=0
+                if (hour_min in before_30min_array):
+                    before_30min_flg=1
+                elif (hour_min in before_10min_array):
+                    before_10min_flg=1
+                else:
+                    before_5min_flg=1  
 
+                cache_4_array=[int(race_id_sanrenpuku),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,sanrenpuku_odds,float(min_odds),float(max_odds),int(sanrenpuku_odds_rank),sanrenpuku_time]
+                
+                if header_flg==0:
+                    sanrenpuku_export_array.append(header_2)
+                    header_flg=1
+                sanrenpuku_export_array.append(cache_4_array)
+                wide_count=wide_count+1
 
-
-
-
-
-
-
+            #csvに出力する
+            path_5="/home/aweqse/"+race_id_sanrenpuku+"_sanrenpuku_odds.csv"
+            df_4=pd.DataFrame(sanrenpuku_export_array)
+            df_4.to_csv(path_5, index=False, header=False, encoding='utf-8-sig') 
+            print("三連複の処理終了")
 
         print("該当時刻ではないので待機します")
         sleep(20)
