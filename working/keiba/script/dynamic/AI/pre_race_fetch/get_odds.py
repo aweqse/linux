@@ -283,11 +283,11 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                     before_10min_flg=1
                 else:
                     before_5min_flg=1  
-
+                header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","最低オッズ","最大オッズ","人気","取得時刻"]
                 cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),int(umaban_3),before_30min_flg,before_10min_flg,before_5min_flg,float(umarenn_odds),float(min_odds),float(max_odds),int(umaren_odds_rank),umaren_time]
                 
                 if header_flg==0:
-                    umaren_export_array.append(header_1)
+                    umaren_export_array.append(header_2)
                     header_flg=1
                 umaren_export_array.append(cache_2_array)
                 umaren_count=umaren_count+1
@@ -369,7 +369,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 cache_3_array=[int(race_id_wide),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,wide_odds,float(min_odds),float(max_odds),int(wide_odds_rank),wide_time]
                 
                 if header_flg==0:
-                    wide_export_array.append(header_1)
+                    wide_export_array.append(header_2)
                     header_flg=1
                 wide_export_array.append(cache_3_array)
                 wide_count=wide_count+1
@@ -398,14 +398,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #要素を変数に格納する
             elements_sanrenpuku_1 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
 
-            #プルダウンを操作して101~200を取得する
-            print("101~200までの要素を取得")
-            select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
-            select = Select(select_elem)
-            select.select_by_index(2)
-            sleep(5)
-            elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
-
             #現在の時刻を取得する
             now = datetime.now()
             hour = now.hour
@@ -421,6 +413,13 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sanrenpuku_match = sanrenpuku_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)"
             sanrenpuku_ele_1=re.findall(sanrenpuku_match,sanrenpuku_ele_1)    
 
+            #プルダウンを操作して101~200を取得する
+            select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
+            select = Select(select_elem)
+            select.select_by_index(2)
+            sleep(5)
+            elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+
             #配列を整形する(101~200)
             for elem_5 in elements_sanrenpuku_2:
                 sanrenpuku_ele_2=elem_5.text.replace("\n"," ")
@@ -432,8 +431,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #同一の処理をするため配列を統合する
             sanrenpuku_array=sanrenpuku_ele_1+sanrenpuku_ele_2
 
-            #配列から要素を変数に格納する(1~100)
-            type_umaren=type_wide==0
+            #配列から要素を変数に格納する
+            type_umaren=type_wide=0
             type_sanrenpuku=1
             cache_4_array=[]
             sanrenpuku_export_array=[]
@@ -441,12 +440,12 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sanrenpuku_count=0
 
             while len(sanrenpuku_array)>sanrenpuku_count:
-                check_4=wide_ele[wide_count]
+                check_4=sanrenpuku_array[sanrenpuku_count]
                 sanrenpuku_odds_rank=check_4[0]
                 umaban_1=check_4[1]
                 umaban_2=check_4[2]
                 umaban_3=check_4[3]
-                sanrenpuku_odds=[4]
+                sanrenpuku_odds=check_4[4]
                 min_odds=-1
                 max_odds=-1
             
@@ -470,7 +469,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                     sanrenpuku_export_array.append(header_2)
                     header_flg=1
                 sanrenpuku_export_array.append(cache_4_array)
-                wide_count=wide_count+1
+                sanrenpuku_count=sanrenpuku_count+1
 
             #csvに出力する
             path_5="/home/aweqse/"+race_id_sanrenpuku+"_sanrenpuku_odds.csv"
