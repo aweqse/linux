@@ -59,7 +59,9 @@ while len(day_elem)>day_count:
     check_4=race_month+race_day
     check_array.append(check_4)
     day_count=day_count+1
-print(check_array)
+
+#テスト用
+md="0713"
 
 if md in check_array:
     mkdir_path="/home/aweqse/dev/working/keiba/output/"+ymd
@@ -67,9 +69,9 @@ if md in check_array:
     path_2=""
     path_3="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
     #生成したファイルを格納するフォルダを作る
-    subprocess.run["mkdir",]
-    subprocess.run["python3",path_1]
-    subprocess.run["python3",path_3]
+    subprocess.run(["mkdir",mkdir_path])
+    subprocess.run(["python3",path_1])
+    subprocess.run(["python3",path_3])
 
 
 
