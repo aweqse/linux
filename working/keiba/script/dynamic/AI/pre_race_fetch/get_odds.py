@@ -431,7 +431,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sanrenpuku_ele_2=sanrenpuku_ele_2[:50]         
 
             #同一の処理をするため配列を統合する
-            sanrenpuku_array=sanrenpuku_ele_1+sanrenpuku_ele_2
+            sanrenpuku_ele_array=sanrenpuku_ele_1+sanrenpuku_ele_2
 
             #配列から要素を変数に格納する
             type_umaren=type_wide=0
@@ -441,8 +441,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             header_flg=0
             sanrenpuku_count=0
 
-            while len(sanrenpuku_array)>sanrenpuku_count:
-                check_4=sanrenpuku_array[sanrenpuku_count]
+            while len(sanrenpuku_ele_array)>sanrenpuku_count:
+                check_4=sanrenpuku_ele_array[sanrenpuku_count]
                 sanrenpuku_odds_rank=check_4[0]
                 umaban_1=check_4[1]
                 umaban_2=check_4[2]
