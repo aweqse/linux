@@ -5,6 +5,7 @@ from time import sleep
 from selenium.webdriver.common.by import By
 import re
 from selenium.webdriver.support.ui import Select
+import sys
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
@@ -19,9 +20,12 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    ymd=get_datetime()
+    
+    ymd,md=get_datetime()
+    check_day(md)
     win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min=read_csv(ymd)
     get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,ymd)
+
 
 def get_datetime():
     now = datetime.now()
@@ -47,7 +51,42 @@ def get_datetime():
     else:
         weekday_now=2
     ymd=year_now+month_now+day_now
-    return ymd
+    md=month_now+day_now
+    return ymd,md
+
+def check_day(md):
+    #今日がレースの日なのかを判定する
+    load_url="https://race.netkeiba.com/top/"
+    xpath_day="/html/body/div[1]/div/div[1]/div[5]/div[2]/div/div[1]/ul"
+    
+    driver.get(load_url)
+
+    #要素を変数に格納する
+    elements_day = driver.find_elements(By.XPATH, xpath_day)
+    for elem_3 in elements_day:
+        day_elem=elem_3.text.split()
+    day_match=r"(\d+)月(\d+)日"
+    day_count=0
+    check_array=[]
+    while len(day_elem)>day_count:
+        check_3=day_elem[day_count]
+        check_3=re.search(day_match,check_3)
+        race_month=check_3.group(1)
+        race_day=check_3.group(2)
+        if len(race_month)==1:
+            race_month="0"+race_month
+        if len(race_day)==1:
+            race_day="0"+race_day
+        check_4=race_month+race_day
+        check_array.append(check_4)
+        day_count=day_count+1
+    print(check_array)
+    
+    if md in check_array:
+        pass
+    else:
+        print("競馬の開催日ではないのでプログラムを終了します")
+        sys.exit()
 
 def read_csv(ymd):
     print("")
