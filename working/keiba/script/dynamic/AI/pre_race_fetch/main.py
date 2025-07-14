@@ -39,6 +39,17 @@ md=month_now+day_now
 load_url="https://race.netkeiba.com/top/"
 xpath_day="/html/body/div[1]/div/div[1]/div[5]/div[2]/div/div[1]/ul"
 driver.get(load_url)
+page_state=driver.execute_script("return document.readyState")
+sleep(5)
+while page_state=="complete":
+    print("url読み込み完了")
+    break
+else:
+    print("URLの読み込みに失敗したため再読み込みします。")
+    driver.get(load_url)
+    sleep(10)
+    page_state=driver.execute_script("return document.readyState")
+
 
 #要素を変数に格納する
 elements_day = driver.find_elements(By.XPATH, xpath_day)
