@@ -84,6 +84,7 @@ def wait_page(load_url):
         page_state=driver.execute_script("return document.readyState")
 
 def get_element():
+    print("レースタイムの取得開始")
     path_1='//*[@class="RaceList_Box clearfix"]'
     elements = driver.find_elements(By.XPATH, path_1)
 
@@ -162,7 +163,7 @@ def process_date(starttime_array,match_check_word,day, month, year, week_now ):
             add_array=[]
             split_count=split_count+1
 
-    print("処理完了")
+    print("レースタイムの取得完了")
     return alltime_array
     
 def export_csv(alltime_array,ymd):
