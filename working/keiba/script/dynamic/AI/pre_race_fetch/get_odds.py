@@ -20,9 +20,7 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    
-    ymd,md=get_datetime()
-    check_day(md)
+    ymd=get_datetime()
     win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min=read_csv(ymd)
     get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,ymd)
 
@@ -51,21 +49,12 @@ def get_datetime():
     else:
         weekday_now=2
     ymd=year_now+month_now+day_now
-    md=month_now+day_now
-    return ymd,md
-
-def check_day(md):
-    #今日がレースの日なのかを判定する
-    load_url="https://race.netkeiba.com/top/"
-    xpath_day="/html/body/div[1]/div/div[1]/div[5]/div[2]/div/div[1]/ul"
-    
-    driver.get(load_url)
-
+    return ymd
 
 def read_csv(ymd):
     print("")
     #csvファイルを読み取りレースIDを抽出しURLを生成する
-    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+str(ymd)+"_racetime.csv"
+    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+str(ymd)+"/get_racetime.csv"
     #テスト用
     path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250706_racetime.csv" 
     df = pd.read_csv(path_1,index_col=False)
@@ -224,7 +213,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 win_count=win_count+1
             
             #csvに出力する
-            path_2="/home/aweqse/"+ymd+"_win_place_odds.csv"
+            path_2="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_win_place_odds.csv"
             df_2=pd.DataFrame(win_export_array)
             df_2.to_csv(path_2, index=False, header=False, encoding='utf-8-sig')           
             print("単勝の処理完了")
@@ -306,7 +295,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 umaren_count=umaren_count+1
             
             #csvに出力する
-            path_3="/home/aweqse/"+race_id_umaren+"_umaren_odds.csv"
+            path_3="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_umaren_odds.csv"
             df_3=pd.DataFrame(umaren_export_array)
             df_3.to_csv(path_3, index=False, header=False, encoding='utf-8-sig') 
             print("馬連の処理終了")
@@ -388,7 +377,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 wide_count=wide_count+1
 
             #csvに出力する
-            path_4="/home/aweqse/"+race_id_wide+"_wide_odds.csv"
+            path_4="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_wide_odds.csv"
             df_3=pd.DataFrame(wide_export_array)
             df_3.to_csv(path_4, index=False, header=False, encoding='utf-8-sig') 
             print("ワイドの処理終了")
@@ -485,7 +474,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 sanrenpuku_count=sanrenpuku_count+1
 
             #csvに出力する
-            path_5="/home/aweqse/"+race_id_sanrenpuku+"_sanrenpuku_odds.csv"
+            path_5="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_sanrenpuku_odds.csv"
             df_4=pd.DataFrame(sanrenpuku_export_array)
             df_4.to_csv(path_5, index=False, header=False, encoding='utf-8-sig') 
             print("三連複の処理終了")
