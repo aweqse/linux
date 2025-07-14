@@ -32,16 +32,13 @@ if len(day_now)==1:
 if len(month_now)==1:
     month_now="0"+str(month_now)
 year_now=str(year_now)
-    
-#NNへの学習を考慮して土曜:0,日曜:1,その他:2という区分けにする
-if weekday_now==5:
-    weekday_now=0
-elif weekday_now==6:
-    weekday_now=1
-else:
-    weekday_now=2
 ymd=year_now+month_now+day_now
 md=month_now+day_now
+
+#今日がレースの日なのかを判定する
+load_url="https://race.netkeiba.com/top/"
+xpath_day="/html/body/div[1]/div/div[1]/div[5]/div[2]/div/div[1]/ul"
+driver.get(load_url)
 
 #要素を変数に格納する
 elements_day = driver.find_elements(By.XPATH, xpath_day)
@@ -68,9 +65,11 @@ if md in check_array:
     mkdir_path="/home/aweqse/dev/working/keiba/output/"+ymd
     path_1="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_racetime.py"
     path_2=""
+    path_3="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
     #生成したファイルを格納するフォルダを作る
     subprocess.run["mkdir",]
     subprocess.run["python3",path_1]
+    subprocess.run["python3",path_3]
 
 
 
