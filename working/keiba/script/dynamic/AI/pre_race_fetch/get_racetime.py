@@ -167,7 +167,7 @@ def process_date(starttime_array,match_check_word,day, month, year, week_now ):
     
 def export_csv(alltime_array,ymd):
     #path="/home/aweqse/"+ymd+"_racetime.csv"
-    path="/home/aweqse/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
+    path="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+ymd+"/"+ymd+"_racetime.csv"
     #path="C:\\workspace\\プログラム\\競馬\\AI\\"+ymd+"_racetime.csv"
     with open(path, "w", newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
