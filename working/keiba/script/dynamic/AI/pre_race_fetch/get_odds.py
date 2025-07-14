@@ -127,7 +127,9 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
         #テスト用
         hour_min=615
         
+        get_flg=0
         while (hour_min in umaren_array):
+
             print("処理を開始します。")
             #urlの読み込み
             load_url_win=win_array[hour_min]
@@ -478,6 +480,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             df_4=pd.DataFrame(sanrenpuku_export_array)
             df_4.to_csv(path_5, index=False, header=False, encoding='utf-8-sig') 
             print("三連複の処理終了")
+            sleep(60)
 
         print("該当時刻ではないので待機します")
         sleep(20)
