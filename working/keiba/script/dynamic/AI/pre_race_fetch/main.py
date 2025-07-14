@@ -84,23 +84,6 @@ if md in check_array:
     subprocess.run(["python3",path_1])
     subprocess.run(["python3",path_3])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 else:
     print("競馬の開催日ではないのでプログラムを終了します")
     sys.exit()
