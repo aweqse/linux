@@ -183,28 +183,47 @@ def  get_and_prosees_data(url_array):
 
         while len(hearder)!=0:
             check_1=hearder[0]
+
+            #テスト用パラメーター
+            #check_1="障1800m"
+
             #要素を変数に格納する処理
             if check_1=="/":
                 del hearder[0]
                 continue    
 
-            if (("芝" in check_1) or ("ダ" in check_1) or ("障" in check_1)) and ("m" in check_1):
-                if ("芝" in check_1):
+            #コースと距離の算出
+            match_1=r"^([芝ダ障])(\d+)m$"
+            check_1=re.match(match_1,check_1)
+            if check_1 is not None:
+                course=check_1.group(1)
+                distance=int(check_1.group(2))
+                if course=="芝":
                     course_turf=1
-                    distance=check_1.replace("芝","").replace("m","")
-                    del hearder[0]
-                    continue                           
-                elif ("ダ" in check_1):
-                    course_dirt=1
-                    distance=check_1.replace("ダ","").replace("m","")
-                    del hearder[0]
-                    continue   
-                elif ("障" in check_1):
-                    course_jump=1
-                    distance=check_1.replace("障","").replace("m","")
-                    del hearder[0]
-                    continue
-                
+                elif course=="ダ":
+                    course_dirt
+                else:
+                    course_jump
+                del hearder[0]
+                continue
+            
+            match_2=r"^(札幌|函館|福島|新潟|中山|東京|中京|京都|阪神|小倉)$"
+            check_1=re.match(match_2,check_1)
+            if check_1 is not None:
+                place=check_1.group(1)
+                if (place is not None) and (place=="東京"or place=="新潟"or place=="中京"):
+                    left_handed=1
+                else:
+                    right_handed=1
+                del hearder[0]
+                continue
+
+
+
+
+
+
+
             if check_1=="札幌" or check_1=="函館" or check_1=="福島" or check_1=="新潟" or check_1=="中山" or check_1=="東京" or check_1=="中京" or check_1=="京都" or  check_1=="阪神"or check_1=="小倉":
                 if  check_1=="新潟" or check_1=="東京"or check_1=="中京":
                     left_handed=1
@@ -212,8 +231,7 @@ def  get_and_prosees_data(url_array):
                     continue   
                 else :
                     right_handed=1
-                    del hearder[0]
-                    continue
+
 
             if (")" in check_1) or len(check_1)==1:
                 if ("A" in check_1):
