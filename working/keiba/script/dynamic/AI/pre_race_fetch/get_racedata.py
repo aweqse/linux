@@ -461,34 +461,10 @@ def  get_and_prosees_data(url_array):
     print("情報取得完了!!")
     return total_array
 
-
-
-
 def export_csv(total_array):
     print("scvに出力開始")
     path_1="/home/aweqse/est.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
-
-
-
-
-            
-
-
-        
-
-
-
-
-
-
-
-
-
-    
-    
-
-
 
 main()
