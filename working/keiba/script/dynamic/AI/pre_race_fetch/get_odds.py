@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import Select
 import subprocess
 
 #リソース確保のため chromeを終了する
-subprocess.run["pkill","chrome"]
+subprocess.run(["pkill","chrome"])
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
