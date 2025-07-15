@@ -6,6 +6,9 @@ import re
 import sys
 import subprocess
 
+#リソース確保のため chromeを終了する
+subprocess.run["pkill","chrome"]
+
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
