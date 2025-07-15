@@ -20,8 +20,8 @@ driver = webdriver.Chrome(options=options)
 def main():
     ymd=get_datetime()
     url_array=read_csv(ymd)
-    header_array=get_and_prosees_data(url_array)
-    export_csv(header_array)
+    data_colme=get_and_prosees_data(url_array)
+    export_csv(data_colme)
 
 #現在の日にちと曜日を取得する
 def get_datetime():
@@ -144,6 +144,7 @@ def  get_and_prosees_data(url_array):
         only_hinba=0
         weght_set=weght_level=weght_allowance=weght_handicap=0
         grade=""
+        place_sapporo=place_hakodate=place_fukushima=place_nigata=place_nakayama=place_tokyo=place_chukyo=place_kyoto=place_hanshin=place_kokura=0
 
         #headerを取得
         elements_1 = driver.find_elements(By.XPATH, xpath_1)
@@ -194,10 +195,10 @@ def  get_and_prosees_data(url_array):
 
             #コースと距離の算出
             match_1=r"^([芝ダ障])(\d+)m$"
-            check_1=re.match(match_1,check_1)
-            if check_1 is not None:
-                course=check_1.group(1)
-                distance=int(check_1.group(2))
+            check_rematch=re.match(match_1,check_1)
+            if check_rematch is not None:
+                course=check_rematch.group(1)
+                distance=int(check_rematch.group(2))
                 if course=="芝":
                     course_turf=1
                 elif course=="ダ":
@@ -206,197 +207,167 @@ def  get_and_prosees_data(url_array):
                     course_jump
                 del hearder[0]
                 continue
-            
+
+            #左回り、右回りを判定する
             match_2=r"^(札幌|函館|福島|新潟|中山|東京|中京|京都|阪神|小倉)$"
-            check_1=re.match(match_2,check_1)
-            if check_1 is not None:
-                place=check_1.group(1)
-                if (place is not None) and (place=="東京"or place=="新潟"or place=="中京"):
-                    left_handed=1
-                else:
-                    right_handed=1
-                del hearder[0]
-                continue
-
-
-
-
-
-
-
-            if check_1=="札幌" or check_1=="函館" or check_1=="福島" or check_1=="新潟" or check_1=="中山" or check_1=="東京" or check_1=="中京" or check_1=="京都" or  check_1=="阪神"or check_1=="小倉":
-                if  check_1=="新潟" or check_1=="東京"or check_1=="中京":
-                    left_handed=1
-                    del hearder[0]
-                    continue   
-                else :
-                    right_handed=1
-
-
-            if (")" in check_1) or len(check_1)==1:
-                if ("A" in check_1):
-                    course_type_A=1
-                    del hearder[0]
-                    continue 
-                elif ("B" in check_1):
-                    course_type_B=1
-                    del hearder[0]
-                    continue 
-                elif ("C" in check_1):
-                    course_type_C=1
-                    del hearder[0]
-                    continue 
-                elif ("D" in check_1):
-                    course_type_D=1
-                    del hearder[0]
-                    continue 
-                elif ("外" in check_1):
-                    course_type_out=1
-                    del hearder[0]
-                    continue 
-                elif ("内" in check_1):
-                    course_type_in=1
-                    del hearder[0]
-                    continue 
-                elif ("2周" in check_1):
-                    course_type_two=1
-                    del hearder[0]
-                    continue 
-            
-            if ("天候:" in check_1):
-                if check_1=="天候:晴":
-                    weather_sunny=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="天候:曇":
-                    weather_cloudy=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="天候:小雨":
-                    weather_light_rain=1
-                    del hearder[0]
-                    continue 
-                elif check_1==":天候:雨":
-                    weather_rain=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="天候:小雪":
-                    weather_cloudy=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="天候:雪":
-                    weather_cloudy=1
-                    del hearder[0]
-                    continue 
-                else:
-                    weather_other=1
-                    del hearder[0]
-                    continue 
-
-            if ("馬場:" in check_1):
-                if check_1=="馬場:良":
-                    baba_good=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="馬場:稍":
-                    baba_light_good=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="馬場:重":
-                    baba_light_soft=1
-                    del hearder[0]
-                    continue                
-                elif check_1=="馬場:不":
-                    baba_soft=1
-                    del hearder[0]
-                    continue 
-
-            if ("サラ系" in check_1) or ("障害" in check_1):
-                #年齢条件の判定のため加工する
-                if ("サラ系" in check_1):
-                    check_1=check_1.replace("サラ系","")
-                else:
-                    check_1=check_1.replace("障害","")
-
-                if check_1=="３歳":
-                    old_3age=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="２歳":
-                    old_2age=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="３歳以上":
-                    old_3age_over=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="４歳以上":
-                    old_4age_over=1
-                    del hearder[0]
-                    continue 
+            check_rematch=re.match(match_2,check_1)
+            if (check_rematch is not None):
+                    place=check_rematch.group(1)
+                    if place=="札幌":
+                        place_sapporo=1
+                    elif place=="函館":
+                        place_hakodate=1
+                    elif place=="福島":
+                        place_fukushima=1
+                    elif place=="新潟":
+                        place_nigata=1
+                    elif place=="中山":
+                        place_nakayama=1
+                    elif place=="東京":
+                        place_tokyo=1
+                    elif place=="中京":
+                        place_chukyo=1
+                    elif place=="京都":
+                        place_tokyo=1
+                    elif place=="阪神":
+                        place_hanshin=1
+                    elif place=="小倉":
+                        place_kokura=1
                 
-            if (check_1=="新馬") or (check_1=="未勝利") or(check_1=="１勝クラス") or (check_1=="２勝クラス") or (check_1=="３勝クラス")  or (check_1=="オープン") :
-                if check_1=="新馬":
-                    racerank_shinba=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="未勝利":
-                    racerank_nowin=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="１勝クラス":
-                    racerank_1win=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="２勝クラス":
-                    racerank_2win=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="３勝クラス":
-                    racerank_3win=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="オープン":
-                    racerank_open=1
-                    del hearder[0]
-                    continue 
-
-            if ("牝" in check_1):
-                if check_1=="牝" or ("牝(" in check_1):
-                    only_hinba=1
-                    del hearder[0]
-                    continue 
-
-            if (check_1=="馬齢") or (check_1=="定量") or(check_1=="別定") or (check_1=="ハンデ") :
-                if check_1=="馬齢":
-                    weght_set=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="定量":
-                    weght_level=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="別定": 
-                    weght_allowance=1
-                    del hearder[0]
-                    continue 
-                elif check_1=="ハンデ":
-                    weght_handicap=1
-                    del hearder[0]
-                    continue 
-            
-            if ("頭" in check_1) and 2<=len(check_1)<=3:
-                    feild_size=check_1.replace("頭","")
+                    if (place=="東京"or place=="新潟"or place=="中京"):
+                        left_handed=1
+                    else:
+                        right_handed=1
                     del hearder[0]
                     continue
+
+            match_3=r"(A|B|C|D|内|外|内2周)\)?"
+            check_rematch=re.match(match_3,check_1)
+            if (check_rematch is not None):
+                course_type=check_rematch.group(1)
+                if course_type=="A":
+                    course_type_A=1
+                elif course_type=="B":
+                    course_type_B=1
+                elif course_type=="C":
+                    course_type_C=1
+                elif course_type=="D":
+                    course_type_D=1
+                elif course_type=="外":
+                    course_type_out=1
+                elif course_type=="内":
+                    course_type_in=1
+                elif course_type=="内2周":
+                    course_type_two=1
+                del hearder[0]
+                continue 
             
+            match_4=r"^(天候:[^\n]+)$"
+            check_rematch=re.match(match_4,check_1)
+            if (check_rematch is not None):
+                course_type=check_rematch.group(1)
+                if course_type=="天候:晴":
+                    weather_sunny=1
+                elif course_type=="天候:曇":
+                    weather_cloudy=1
+                elif course_type=="天候:小雨":
+                    weather_light_rain=1               
+                elif course_type=="天候:雨":
+                    weather_rain=1                
+                elif course_type=="天候:小雪":
+                    weather_light_snow=1                
+                elif course_type=="天候:雪":
+                    weather_snow=1
+                else:
+                    weather_other=1
+                del hearder[0]
+                continue 
+
+            match_5=r"^(馬場:[^\n])$"
+            check_rematch=re.match(match_5,check_1)
+            if (check_rematch is not None):
+                baba=check_rematch.group(1)
+                if baba=="馬場:良":
+                    baba_good=1
+                elif baba=="馬場:稍":
+                    baba_light_good=1
+                elif baba=="馬場:重":
+                    baba_light_soft=1
+                elif baba=="馬場:不":
+                    baba_soft=1
+                del hearder[0]
+                continue 
+
+            match_6=r"^(サラ系|障害)(\d歳[^\n]*)$"
+            check_rematch=re.match(match_6,check_1)
+            if (check_rematch is not None):
+                age=check_rematch.group(2)
+                if age=="３歳":
+                    old_3age=1
+                elif age=="２歳":
+                    old_2age=1
+                elif age=="３歳以上":
+                    old_3age_over=1
+                elif age=="４歳以上":
+                    old_4age_over=1
+                del hearder[0]
+                continue 
+
+            match_7=r"^(新馬|未勝利|１勝クラス|２勝クラス|３勝クラス|オープン)$"
+            check_rematch=re.match(match_7,check_1)
+            if (check_rematch is not None):
+                rank=check_rematch.group(1)
+                if rank=="新馬":
+                    racerank_shinba=1
+                elif rank=="未勝利":
+                    racerank_nowin
+                elif rank=="１勝クラス":
+                    racerank_1win=1                
+                elif rank=="２勝クラス":
+                    racerank_2win=1                
+                elif rank=="３勝クラス":
+                    racerank_3win=1
+                elif rank=="オープン":
+                    racerank_open=1
+                del hearder[0]
+                continue 
+
+            match_8=r"^牝(\(.*?\))?$"
+            check_rematch=re.match(match_8,check_1)
+            if (check_rematch is not None):
+                if (check_rematch is not None):
+                    only_hinba=1
+                del hearder[0]
+                continue 
+
+            match_9=r"^(馬齢|定量|別定|ハンデ)$"
+            check_rematch=re.match(match_9,check_1)
+            if (check_rematch is not None):
+                rank=check_rematch.group(1)
+                if rank=="馬齢":
+                    weght_set=1
+                elif rank=="定量":
+                    weght_level=1
+                elif rank=="別定":
+                    weght_allowance=1                
+                elif rank=="ハンデ":
+                    weght_handicap=1 
+                del hearder[0]
+                continue 
+            
+            match_10=r"^(\d+)頭$"
+            check_rematch=re.match(match_10,check_1)
+            if (check_rematch is not None):
+                feild_size=check_rematch.group(1)
+                del hearder[0]
+                continue 
+
             del hearder[0]
             continue 
 
         #URLからrace_idを読み取る
         race_id=int(load_url[-12:])
             
-        header_colmes=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","レースID"]
         #変数の初期化
         header_data=[
         race_id,
@@ -414,10 +385,6 @@ def  get_and_prosees_data(url_array):
         int(feild_size)
         ]
 
-        if header_flag==0:
-            header_array.append(header_colmes)
-            header_flag=1
-
         header_array.append(header_data)
         load_count=load_count+1
         print("ヘッダーの情報格納完了")
@@ -431,57 +398,120 @@ def  get_and_prosees_data(url_array):
         after_data = after_data.replace("--", " ").replace("\n", " ").strip().split() #余計な文字を空白に置き換えてまとめて削除して要素に分割する
         
         #配列内のデータを分離させる処理
+        data_colme=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","レースID","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","厩舎所属","調教師","調教師ID","馬体重","増減",""]
         after_data_count=0
         array_len=len(after_data)
+        total_array=[]
         while array_len>after_data_count:
             check_2=after_data[after_data_count]
-            match_1=re.match(r"^([牡牝セ])(\d+)$",check_2)
-            match_2=re.match(r"^(栗東|美浦|海外)(.+)",check_2)
-            match_3=re.match(r"^(\d+)\(([-+]?\d+)\)$",check_2)
-            if match_1:
-                end_1=match_1.group(1)
-                top_1=match_1.group(2)
-                del after_data[after_data_count]
-                after_data.insert(after_data_count,top_1)
-                after_data.insert(after_data_count,end_1)
+            match_11=re.match(r"^([牡牝セ])(\d+)$",str(check_2))
+            match_12=re.match(r"^(栗東|美浦|海外)(.+)",str(check_2))
+            match_13=re.match(r"^(\d+)\(([-+]?\d+)\)$",str(check_2))
+            
+            #馬IDをインサートする(馬idのデテーブルを作成後)
+            if after_data_count==3:
+                horse_id=-1 #仮
+                after_data.insert(after_data_count,horse_id)
+                
+                #配列の要素の再計算
+                array_len=len(after_data)
+            
+            #騎手IDをインサートする(騎手idのデテーブルを作成後)
+            elif after_data_count==6:
+                jockey_id=-1 #仮
+                after_data.insert(after_data_count,jockey_id)
+                
+                #配列の要素の再計算
                 array_len=len(after_data)
 
-            elif match_2:
-                end_2=match_2.group(1)
-                top_2=match_2.group(2)
+            #性別と馬齢の分離
+            elif match_11:
+                end_1=match_11.group(1)
+                sex_mare=sex_colt=sex_gelding=0
+                if end_1=="牝":
+                    sex_mare=1
+                elif end_1=="牡":
+                    sex_colt=1
+                else:
+                    sex_gelding=1
+                #馬齢の取り出し
+                top_1=match_11.group(2)
+                del after_data[after_data_count]
+                
+                #分離した変数を配列に戻す
+                after_data.insert(after_data_count,top_1)
+                after_data.insert(after_data_count+1,sex_mare)
+                after_data.insert(after_data_count+2,sex_colt)
+                after_data.insert(after_data_count+2,sex_gelding)
+                
+                #配列の要素の再計算
+                array_len=len(after_data)
+            
+            #所属厩舎と調教師の分離
+            elif match_12:
+                end_2=match_12.group(1)
+                top_2=match_12.group(2)
                 del after_data[after_data_count]
                 after_data.insert(after_data_count,top_2)
-                after_data.insert(after_data_count,end_2)
+
+                #配列の要素の再計算
+                array_len=len(after_data)
+                
+                #調教師IDをインサートする(調教師idテーブルを作成後)
+                trainer_id=-1#仮
+                after_data.insert(after_data_count,trainer_id)
+
+                #配列の要素の再計算
                 array_len=len(after_data)
 
-            elif match_3:
-                end_3=match_3.group(1)
-                top_3=match_3.group(2)
+                #所属厩舎を判定してインサートする
+                if end_2=="美浦":
+                    east_west=0
+                elif end_2=="栗東":
+                    east_west=1
+                else:
+                    east_west=2
+                after_data.insert(after_data_count,east_west)
+                after_data.insert(after_data_count+1,trainer_id)
+
+                #配列の要素の再計算
+                array_len=len(after_data)
+            
+            #馬体重と増減の分離
+            elif match_13:
+                end_3=match_13.group(1)
+                top_3=match_13.group(2)
                 del after_data[after_data_count]
                 after_data.insert(after_data_count,top_3)
                 after_data.insert(after_data_count,end_3)
+                
+                #配列の要素の再計算
                 array_len=len(after_data)
 
             after_data_count=after_data_count+1
             array_len=len(after_data)
+
         maindata_count=maindata_count+1
-        after_maindata.append(after_data)
+        #ヘッダーとレースデータを統合する
+        total_array=(header_array+after_data)
+        #ヘッダーとレースデータをアペンドする
+        data_colme.append(total_array)
+        after_data=[]
         continue
+
     print("要素の分離と配列の格納完了")
-    
-
-
-
-
-
     #chromeを閉じる
     driver.quit()
     print("情報取得完了!!")
-    return header_array
+    return data_colme
 
-def export_csv(header_array):
+
+
+
+def export_csv(data_colme):
+    print("scvに出力開始")
     path_1="/home/aweqse/est.csv"
-    df_2=pd.DataFrame(header_array)
+    df_2=pd.DataFrame(data_colme)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
 
 
