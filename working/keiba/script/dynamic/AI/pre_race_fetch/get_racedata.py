@@ -97,10 +97,9 @@ def  get_and_prosees_data(url_array):
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
         #牝馬
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
-
-        load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
-        url_array=[]
-        url_array.append(load_url)
+        #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
+        #url_array=[]
+        #url_array.append(load_url)
 
         driver.get(load_url)
 

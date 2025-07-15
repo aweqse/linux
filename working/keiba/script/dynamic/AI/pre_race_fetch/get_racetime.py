@@ -68,7 +68,7 @@ def get_url(datetime_array):
     load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date="+url_str
     
     #テスト用のURL
-    load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date=20250713"
+    #load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date=20250713"
 
     driver.get(load_url)
     return load_url,day, month, year, week_now 

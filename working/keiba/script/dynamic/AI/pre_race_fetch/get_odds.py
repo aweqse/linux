@@ -118,7 +118,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
     hour_min=hour*60+minute #時刻を分に変換する
 
     #テスト用
-    hour_min=615
+    #hour_min=615
     
     while hour_min<1020:
         #時刻の再取得
@@ -128,7 +128,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
         hour_min=hour*60+minute 
 
         #テスト用
-        hour_min=615
+        #hour_min=615
         
         get_flg=0
         while (hour_min in umaren_array):
