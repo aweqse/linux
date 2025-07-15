@@ -24,8 +24,8 @@ driver = webdriver.Chrome(options=options)
 def main():
     ymd=get_datetime()
     url_array=read_csv(ymd)
-    total_array=get_and_prosees_data(url_array)
-    export_csv(total_array)
+    total_array,race_id=get_and_prosees_data(url_array)
+    export_csv(total_array,race_id,ymd)
 
 #現在の日にちと曜日を取得する
 def get_datetime():
@@ -464,9 +464,9 @@ def  get_and_prosees_data(url_array):
     print("情報取得完了!!")
     return total_array
 
-def export_csv(total_array):
+def export_csv(total_array,race_id,ymd):
     print("csvに出力開始")
-    path_1="/home/aweqse/est.csv"
+    path_1="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")
