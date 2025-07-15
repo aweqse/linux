@@ -80,11 +80,13 @@ md="0713"
 if md in check_array:
     mkdir_path="/home/aweqse/dev/working/keiba/output/"+ymd
     path_1="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_racetime.py"
-    path_2=""
+    path_2="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_racedata.py"
     path_3="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
+    
     #生成したファイルを格納するフォルダを作る
     subprocess.run(["mkdir",mkdir_path])
     subprocess.run(["python3",path_1])
+    subprocess.run(["python3",path_2])
     subprocess.run(["python3",path_3])
 
 else:
