@@ -450,9 +450,9 @@ def  get_and_prosees_data(url_array):
             weight_change=re_match.group(11)
 
             #変数を入れ配列を作成する
-            maindate_array=[ wakuban,umaban,horse_name,horse_id,sex_male,sex_female,sex_gelding,
-                            horse_old,horse_weighgt,jockey,kopckey_id,belong_east,belong_west,belong_oversea,
-                            trainer,trainer_id,horse_weight,weight_change]
+            maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
+                            int(horse_old),float(horse_weighgt),jockey,kopckey_id,belong_east,belong_west,belong_oversea,
+                            trainer,trainer_id,int(horse_weight),int(weight_change)]
             add_array=header_data+maindate_array
             total_array.append(add_array)
             maindata_count=maindata_count+1
