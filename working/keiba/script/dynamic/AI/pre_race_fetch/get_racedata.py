@@ -20,8 +20,8 @@ driver = webdriver.Chrome(options=options)
 def main():
     ymd=get_datetime()
     url_array=read_csv(ymd)
-    data_colme=get_and_prosees_data(url_array)
-    export_csv(data_colme)
+    total_array=get_and_prosees_data(url_array)
+    export_csv(total_array)
 
 #現在の日にちと曜日を取得する
 def get_datetime():
@@ -68,8 +68,6 @@ def read_csv(ymd):
 
 def  get_and_prosees_data(url_array):
     load_count=0
-    header_array=[]
-    header_flag=0
     while len(url_array)>load_count:
         print("ヘッダーの情報格納開始")
 
@@ -375,6 +373,7 @@ def  get_and_prosees_data(url_array):
         racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
         course_turf,course_dirt,course_jump,
         int(distance),
+        place_sapporo,place_hakodate,place_fukushima,place_nigata,place_nakayama,place_tokyo,place_chukyo,place_kyoto,place_hanshin,place_kokura,        
         right_handed,left_handed,other_handed,
         course_type_A,course_type_B,course_type_C,course_type_D,course_type_out,course_type_in,course_type_two,
         weather_sunny,weather_cloudy,weather_light_rain,weather_rain,weather_snow,weather_light_snow,weather_other,
@@ -384,134 +383,87 @@ def  get_and_prosees_data(url_array):
         weght_set,weght_level,weght_allowance,weght_handicap,
         int(feild_size)
         ]
-
-        header_array.append(header_data)
         load_count=load_count+1
         print("ヘッダーの情報格納完了")
     
     #配列を要素に分割する
     maindata_count=0
-    after_maindata=[]
+    total_array=[]
+    data_colme=["レースID","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","厩舎所属","調教師","調教師ID","馬体重","増減"]
     print("出走馬の情報を取得開始")
+    total_array.append(data_colme)
+    match_11=r"(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]\d+)\)"
+    
     while len(maindata)>maindata_count:
-        after_data=maindata[maindata_count]
-        after_data = after_data.replace("--", " ").replace("\n", " ").strip().split() #余計な文字を空白に置き換えてまとめて削除して要素に分割する
+        #変数の初期化
+        sex_male=sex_female=sex_gelding=0
+        belong_east=belong_west=belong_oversea=0
         
-        #配列内のデータを分離させる処理
-        data_colme=["新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","レースID","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","厩舎所属","調教師","調教師ID","馬体重","増減",""]
-        after_data_count=0
-        array_len=len(after_data)
-        total_array=[]
-        while array_len>after_data_count:
-            check_2=after_data[after_data_count]
-            match_11=re.match(r"^([牡牝セ])(\d+)$",str(check_2))
-            match_12=re.match(r"^(栗東|美浦|海外)(.+)",str(check_2))
-            match_13=re.match(r"^(\d+)\(([-+]?\d+)\)$",str(check_2))
-            
-            #馬IDをインサートする(馬idのデテーブルを作成後)
-            if after_data_count==3:
-                horse_id=-1 #仮
-                after_data.insert(after_data_count,horse_id)
-                
-                #配列の要素の再計算
-                array_len=len(after_data)
-            
-            #騎手IDをインサートする(騎手idのデテーブルを作成後)
-            elif after_data_count==6:
-                jockey_id=-1 #仮
-                after_data.insert(after_data_count,jockey_id)
-                
-                #配列の要素の再計算
-                array_len=len(after_data)
+        #判定する要素を取り出す
+        check_2=maindata[maindata_count]
+        
+        #余計な文字を空白に置き換えてまとめて削除して要素に分割する
+        after_data = after_data.replace("--", " ").replace("\n", " ")
+        re_match=re.match(match_11,str(check_2))
 
-            #性別と馬齢の分離
-            elif match_11:
-                end_1=match_11.group(1)
-                sex_mare=sex_colt=sex_gelding=0
-                if end_1=="牝":
-                    sex_mare=1
-                elif end_1=="牡":
-                    sex_colt=1
-                else:
-                    sex_gelding=1
-                #馬齢の取り出し
-                top_1=match_11.group(2)
-                del after_data[after_data_count]
-                
-                #分離した変数を配列に戻す
-                after_data.insert(after_data_count,top_1)
-                after_data.insert(after_data_count+1,sex_mare)
-                after_data.insert(after_data_count+2,sex_colt)
-                after_data.insert(after_data_count+2,sex_gelding)
-                
-                #配列の要素の再計算
-                array_len=len(after_data)
-            
-            #所属厩舎と調教師の分離
-            elif match_12:
-                end_2=match_12.group(1)
-                top_2=match_12.group(2)
-                del after_data[after_data_count]
-                after_data.insert(after_data_count,top_2)
+        wakuban=re_match.group(1)
+        umaban=re_match.group(2)
+        horse_name=re_match.group(3)
 
-                #配列の要素の再計算
-                array_len=len(after_data)
-                
-                #調教師IDをインサートする(調教師idテーブルを作成後)
-                trainer_id=-1#仮
-                after_data.insert(after_data_count,trainer_id)
+        #horse_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+        horse_id=-10
+        
+        sex=re_match.group(4)
+        if sex=="牡":
+            sex_male=1
+        elif sex=="牝":
+            sex_female=1
+        elif sex=="セ":
+            sex_gelding=1
+        horse_old=re_match.group(5)
+        horse_weighgt=re_match.group(6)
+        jockey=re_match.group(7)
 
-                #配列の要素の再計算
-                array_len=len(after_data)
+        #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+        kopckey_id=-10
 
-                #所属厩舎を判定してインサートする
-                if end_2=="美浦":
-                    east_west=0
-                elif end_2=="栗東":
-                    east_west=1
-                else:
-                    east_west=2
-                after_data.insert(after_data_count,east_west)
-                after_data.insert(after_data_count+1,trainer_id)
+        belong_trainer=re_match.group(8)
+        if belong_trainer=="美浦":
+            belong_east=1
+        elif belong_trainer=="栗東":
+            belong_west=1
+        elif belong_trainer=="海外":
+            belong_oversea=1
+        trainer=re_match.group(9)
 
-                #配列の要素の再計算
-                array_len=len(after_data)
-            
-            #馬体重と増減の分離
-            elif match_13:
-                end_3=match_13.group(1)
-                top_3=match_13.group(2)
-                del after_data[after_data_count]
-                after_data.insert(after_data_count,top_3)
-                after_data.insert(after_data_count,end_3)
-                
-                #配列の要素の再計算
-                array_len=len(after_data)
+        #trainer_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+        trainer_id=10
 
-            after_data_count=after_data_count+1
-            array_len=len(after_data)
+        horse_weight=re_match.group(10)
+        weight_change=re_match.group(11)
 
+        #変数を入れ配列を作成する
+        maindate_array=[ wakuban,umaban,horse_name,horse_id,sex_male,sex_female,sex_gelding,
+                        horse_old,horse_weighgt,jockey,kopckey_id,belong_east,belong_west,belong_oversea,
+                        trainer,trainer_id,horse_weight,weight_change]
+        add_array=header_data+maindate_array
+        total_array.append(add_array)
         maindata_count=maindata_count+1
-        #ヘッダーとレースデータを統合する
-        total_array=(header_array+after_data)
-        #ヘッダーとレースデータをアペンドする
-        data_colme.append(total_array)
-        after_data=[]
         continue
 
     print("要素の分離と配列の格納完了")
     #chromeを閉じる
     driver.quit()
     print("情報取得完了!!")
-    return data_colme
+    return total_array
 
 
 
 
-def export_csv(data_colme):
+def export_csv(total_array):
     print("scvに出力開始")
     path_1="/home/aweqse/est.csv"
-    df_2=pd.DataFrame(data_colme)
+    df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
 
 
