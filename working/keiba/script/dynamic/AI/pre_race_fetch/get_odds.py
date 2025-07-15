@@ -5,7 +5,10 @@ from time import sleep
 from selenium.webdriver.common.by import By
 import re
 from selenium.webdriver.support.ui import Select
-import sys
+import subprocess
+
+#リソース確保のため chromeを終了する
+subprocess.run["pkill","chrome"]
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")

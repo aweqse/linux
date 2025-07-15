@@ -4,6 +4,10 @@ from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
 import re
+import subprocess
+
+#リソース確保のため chromeを終了する
+subprocess.run["pkill","chrome"]
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless=new")
