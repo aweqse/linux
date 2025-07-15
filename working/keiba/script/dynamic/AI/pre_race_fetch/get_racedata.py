@@ -462,7 +462,7 @@ def  get_and_prosees_data(url_array):
     #chromeを閉じる
     driver.quit()
     print("情報取得完了!!")
-    return total_array
+    return total_array,race_id
 
 def export_csv(total_array,race_id,ymd):
     print("csvに出力開始")
