@@ -393,67 +393,70 @@ def  get_and_prosees_data(url_array):
     #配列を要素に分割する
     maindata_count=0
     total_array=[]
-    data_colme=["レースID","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","厩舎所属","調教師","調教師ID","馬体重","増減"]
+    data_colme=["レースID","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","美浦","栗東","海外","調教師","調教師ID","馬体重","増減"]
     print("出走馬の情報を取得開始")
     total_array.append(data_colme)
-    match_11=r"(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]\d+)\)"
+    match_11=r"\s*(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]?\d+)\)"
     
     while len(maindata)>maindata_count:
         #変数の初期化
         sex_male=sex_female=sex_gelding=0
         belong_east=belong_west=belong_oversea=0
         
-        #判定する要素を取り出す
+        #判定する配列を取り出す
         check_2=maindata[maindata_count]
-        
-        #余計な文字を空白に置き換えてまとめて削除して要素に分割する
-        after_data = after_data.replace("--", " ").replace("\n", " ")
-        re_match=re.match(match_11,str(check_2))
+        if len(check_2)==0:
+            maindata_count=maindata_count+1
+            pass
+        else:
+            #余計な文字を空白に置き換えてまとめて削除して要素に分割する
+            check_2 = check_2.replace("--", " ").replace("\n", " ")
+            re_match=re.match(match_11,str(check_2))
 
-        wakuban=re_match.group(1)
-        umaban=re_match.group(2)
-        horse_name=re_match.group(3)
+            wakuban=re_match.group(1)
+            umaban=re_match.group(2)
+            horse_name=re_match.group(3)
 
-        #horse_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
-        horse_id=-10
-        
-        sex=re_match.group(4)
-        if sex=="牡":
-            sex_male=1
-        elif sex=="牝":
-            sex_female=1
-        elif sex=="セ":
-            sex_gelding=1
-        horse_old=re_match.group(5)
-        horse_weighgt=re_match.group(6)
-        jockey=re_match.group(7)
+            #horse_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+            horse_id=-10
+            
+            sex=re_match.group(4)
+            if sex=="牡":
+                sex_male=1
+            elif sex=="牝":
+                sex_female=1
+            elif sex=="セ":
+                sex_gelding=1
+            horse_old=re_match.group(5)
+            horse_weighgt=re_match.group(6)
+            jockey=re_match.group(7)
 
-        #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
-        kopckey_id=-10
+            #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+            kopckey_id=-10
 
-        belong_trainer=re_match.group(8)
-        if belong_trainer=="美浦":
-            belong_east=1
-        elif belong_trainer=="栗東":
-            belong_west=1
-        elif belong_trainer=="海外":
-            belong_oversea=1
-        trainer=re_match.group(9)
+            belong_trainer=re_match.group(8)
+            if belong_trainer=="美浦":
+                belong_east=1
+            elif belong_trainer=="栗東":
+                belong_west=1
+            elif belong_trainer=="海外":
+                belong_oversea=1
+            trainer=re_match.group(9)
 
-        #trainer_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
-        trainer_id=10
+            #trainer_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+            trainer_id=-10
 
-        horse_weight=re_match.group(10)
-        weight_change=re_match.group(11)
+            horse_weight=re_match.group(10)
+            weight_change=re_match.group(11)
 
-        #変数を入れ配列を作成する
-        maindate_array=[ wakuban,umaban,horse_name,horse_id,sex_male,sex_female,sex_gelding,
-                        horse_old,horse_weighgt,jockey,kopckey_id,belong_east,belong_west,belong_oversea,
-                        trainer,trainer_id,horse_weight,weight_change]
-        add_array=header_data+maindate_array
-        total_array.append(add_array)
-        maindata_count=maindata_count+1
-        continue
+            #変数を入れ配列を作成する
+            maindate_array=[ wakuban,umaban,horse_name,horse_id,sex_male,sex_female,sex_gelding,
+                            horse_old,horse_weighgt,jockey,kopckey_id,belong_east,belong_west,belong_oversea,
+                            trainer,trainer_id,horse_weight,weight_change]
+            add_array=header_data+maindate_array
+            total_array.append(add_array)
+            maindata_count=maindata_count+1
+            continue
 
     print("要素の分離と配列の格納完了")
     #chromeを閉じる
@@ -462,9 +465,10 @@ def  get_and_prosees_data(url_array):
     return total_array
 
 def export_csv(total_array):
-    print("scvに出力開始")
+    print("csvに出力開始")
     path_1="/home/aweqse/est.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
+    print("csvに出力完了")
 
 main()
