@@ -6,6 +6,8 @@ from selenium.webdriver.common.by import By
 import re
 from selenium.webdriver.support.ui import Select
 import subprocess
+import get_day_and_config
+import get_racedata
 
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
@@ -23,69 +25,49 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    ymd=get_datetime()
-    win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min=read_csv(ymd)
-    get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,ymd)
+    win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict=read_csv()
+    get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict)
 
 
-def get_datetime():
-    now = datetime.now()
-    day_now=int(now.day)
-    month_now=int(now.month)
-    year_now = now.year
-    weekday_now=now.weekday()
-
-    #数字が一桁の場合二けたにする
-    day_now=str(day_now)
-    month_now=str(month_now)
-    if len(day_now)==1:
-        day_now="0"+str(day_now)
-    if len(month_now)==1:
-        month_now="0"+str(month_now)
-    year_now=str(year_now)
-        
-    #NNへの学習を考慮して土曜:0,日曜:1,その他:2という区分けにする
-    if weekday_now==5:
-        weekday_now=0
-    elif weekday_now==6:
-        weekday_now=1
-    else:
-        weekday_now=2
-    ymd=year_now+month_now+day_now
-    return ymd
-
-def read_csv(ymd):
-    print("")
+def read_csv():
+    print("urlの格納開始")
+    ymd=get_day_and_config.ymd
     #csvファイルを読み取りレースIDを抽出しURLを生成する
     path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+str(ymd)+"/get_racetime.csv"
+    
     #テスト用
-    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250713_racetime.csv" 
-    
+    path_1="/home/aweqse/dev/working/keiba/output/20250715/20250715_racetime.csv" 
+
     df = pd.read_csv(path_1,index_col=False)
-    
+    #csvファイルから情報を読み取る
+    race_id=df["レースID"]
+    before_30min=df["発送時刻30分前"]
+    before_10min=df["発送時刻10分前"]
+    before_5min=df["発送時刻5分前"]
+
     #カラム名を配列に格納して時刻とオッズURLを辞書型にする
     win_url="https://race.netkeiba.com/odds/index.html?race_id="
     umaren_url_1="https://race.netkeiba.com/odds/index.html?type=b4&race_id="
     wide_url_1="https://race.netkeiba.com/odds/index.html?type=b5&race_id="
     sanrenpuku_url_1="https://race.netkeiba.com/odds/index.html?type=b7&race_id="
+    race_date_url="https://race.netkeiba.com/race/shutuba.html?race_id="
     url_2="&housiki=c99"
-    race_id=df["レースID"]
-    before_30min=df["発送時刻30分前"]
-    before_10min=df["発送時刻10分前"]
-    before_5min=df["発送時刻5分前"]
 
     #urlの生成
     win_url_araay=[win_url+ str(s) for s in race_id]
     umaren_url_array=[umaren_url_1 + str(s) + url_2 for s in race_id]
     wide_url_1array=[wide_url_1 + str(s) + url_2 for s in race_id]
     sanrenpuku_url_1_array=[sanrenpuku_url_1 + str(s) + url_2 for s in race_id]
+    racedate_url_array=[race_date_url+ str(s) for s in race_id]
     print("urlの格納完了")
+
     print("辞書の作成開始")
     umaren_array={}
     win_array={}
     wide_1array={}
     sanrenpuku_array={}
 
+    #キーが同じ値だと上書きされるため時間とURLは別々で生成する
     #30分前
     before_30min_win=dict(zip(before_30min, win_url_araay))
     before_30min_umaren=dict(zip(before_30min, umaren_url_array))
@@ -97,6 +79,7 @@ def read_csv(ymd):
     before_10min_umaren=dict(zip(before_10min, umaren_url_array))
     before_10min_wide=dict(zip(before_10min, wide_url_1array))
     before_10min_sanrenpuku=dict(zip(before_10min, sanrenpuku_url_1_array))
+    racedata_dict=dict(zip(before_10min, racedate_url_array))
 
     #5分前
     before_5min_win=dict(zip(before_5min, win_url_araay))
@@ -109,30 +92,27 @@ def read_csv(ymd):
     umaren_array = {**before_30min_umaren, **before_10min_umaren,**before_5min_umaren}
     wide_1array = {**before_30min_wide, **before_10min_wide,**before_5min_wide}
     sanrenpuku_array = {**before_30min_sanrenpuku, **before_10min_sanrenpuku,**before_5min_sanrenpuku}
-    return win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min
+    print("辞書の作成完了")
+    return win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict
 
-def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,ymd):
-    #時刻を取得する
-    now = datetime.now()
-    hour = now.hour
-    minute = now.minute
-    hour_min=hour*60+minute #時刻を分に変換する
+def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict):
 
-    #テスト用
-    #hour_min=615
-    
     while hour_min<1020:
-        #時刻の再取得
-        now = datetime.now()
-        hour = now.hour
-        minute = now.minute
-        hour_min=hour*60+minute 
+        hour_min=get_day_and_config.hour_min
 
         #テスト用
         #hour_min=615
         
         get_flg=0
         while (hour_min in umaren_array):
+            
+            before_30min_flg=before_10min_flg=before_5min_flg=0
+            if (hour_min in before_30min_array):
+                before_30min_flg=1
+            elif (hour_min in before_10min_array):
+                before_10min_flg=1
+            else:
+                before_5min_flg=1  
 
             print("処理を開始します。")
             #urlの読み込み
@@ -199,15 +179,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 
                 win_match=r"(\d+)$"
                 match=re.search(win_match,load_url_win)
-                race_id=match.group(1)
-
-                before_30min_flg=before_10min_flg=before_5min_flg=0
-                if (hour_min in before_30min_array):
-                    before_30min_flg=1
-                elif (hour_min in before_10min_array):
-                    before_10min_flg=1
-                else:
-                    before_5min_flg=1       
+                race_id=match.group(1) 
                 
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
@@ -218,13 +190,21 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 win_export_array.append(cache_1_array)
                 win_count=win_count+1
             
+            #racedate10分前の場合,racedataを作成する
+            if before_10min_flg==1:
+                load_url=racedata_dict[hour_min]
+                get_racedata.main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
+                
             #csvに出力する
+            ymd=get_day_and_config.ymd
             path_2="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_win_place_odds.csv"
             df_2=pd.DataFrame(win_export_array)
             df_2.to_csv(path_2, index=False, header=False, encoding='utf-8-sig')           
             print("単勝の処理完了")
-                
 
+
+                
+            
 
 
             #馬連の要素を取得する
@@ -284,13 +264,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 race_id_umaren=match.group(1)
 
                 #取得した時刻を判定する
-                before_30min_flg=before_10min_flg=before_5min_flg=0
-                if (hour_min in before_30min_array):
-                    before_30min_flg=1
-                elif (hour_min in before_10min_array):
-                    before_10min_flg=1
-                else:
-                    before_5min_flg=1  
                 header_2=["レースID","ワイド","馬連","三連複","馬番1","馬番2","馬番3","30分前","10分前","5分前","オッズ","最低オッズ","最大オッズ","人気","取得時刻"]
                 cache_2_array=[int(race_id_umaren),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),int(umaban_3),before_30min_flg,before_10min_flg,before_5min_flg,float(umarenn_odds),float(min_odds),float(max_odds),int(umaren_odds_rank),umaren_time]
                 
@@ -301,6 +274,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 umaren_count=umaren_count+1
             
             #csvに出力する
+            ymd=get_day_and_config.ymd
             path_3="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_umaren_odds.csv"
             df_3=pd.DataFrame(umaren_export_array)
             df_3.to_csv(path_3, index=False, header=False, encoding='utf-8-sig') 
@@ -365,15 +339,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 match=re.search(wide_match,load_url_wide)
                 race_id_wide=match.group(1)
 
-                #取得した時刻を判定する
-                before_30min_flg=before_10min_flg=before_5min_flg=0
-                if (hour_min in before_30min_array):
-                    before_30min_flg=1
-                elif (hour_min in before_10min_array):
-                    before_10min_flg=1
-                else:
-                    before_5min_flg=1  
-
                 cache_3_array=[int(race_id_wide),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,wide_odds,float(min_odds),float(max_odds),int(wide_odds_rank),wide_time]
                 
                 if header_flg==0:
@@ -383,6 +348,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 wide_count=wide_count+1
 
             #csvに出力する
+            ymd=get_day_and_config.ymd
             path_4="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_wide_odds.csv"
             df_3=pd.DataFrame(wide_export_array)
             df_3.to_csv(path_4, index=False, header=False, encoding='utf-8-sig') 
@@ -462,15 +428,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 match=re.search(sanrenpuku_match,load_url_sanrenpuku)
                 race_id_sanrenpuku=match.group(1)
 
-                #取得した時刻を判定する
-                before_30min_flg=before_10min_flg=before_5min_flg=0
-                if (hour_min in before_30min_array):
-                    before_30min_flg=1
-                elif (hour_min in before_10min_array):
-                    before_10min_flg=1
-                else:
-                    before_5min_flg=1  
-
                 cache_4_array=[int(race_id_sanrenpuku),type_wide,type_umaren,type_sanrenpuku,int(umaban_1),int(umaban_2),umaban_3,before_30min_flg,before_10min_flg,before_5min_flg,sanrenpuku_odds,float(min_odds),float(max_odds),int(sanrenpuku_odds_rank),sanrenpuku_time]
                 
                 if header_flg==0:
@@ -480,23 +437,18 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 sanrenpuku_count=sanrenpuku_count+1
 
             #csvに出力する
+            ymd=get_day_and_config.ymd
             path_5="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+race_id+ "_sanrenpuku_odds.csv"
             df_4=pd.DataFrame(sanrenpuku_export_array)
             df_4.to_csv(path_5, index=False, header=False, encoding='utf-8-sig') 
             print("三連複の処理終了")
             print("取得が完了したので待機します")
             sleep(60)
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            hour_min=hour*60+minute 
+            hour_min=get_day_and_config.hour_min
 
         print("該当時刻ではないので待機します")
         sleep(20)
-        now = datetime.now()
-        hour = now.hour
-        minute = now.minute
-        hour_min=hour*60+minute
+        hour_min=get_day_and_config.hour_min
         continue 
 
     print("競馬の終了時刻となったので待機を終了します")
