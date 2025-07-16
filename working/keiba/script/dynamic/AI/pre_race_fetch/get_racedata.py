@@ -1,10 +1,10 @@
-from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
 import re
 import subprocess
+import get_day_and_config
 
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
@@ -22,169 +22,123 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    ymd,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth=get_datetime()
-    url_array=read_csv(ymd)
-    total_array,race_id=get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth)
-    export_csv(total_array,race_id,ymd)
+    total_array,race_id=get_and_prosees_data()
+    export_csv(total_array,race_id)
 
-#現在の日にちと曜日を取得する
-def get_datetime():
-    now = datetime.now()
-    day_now=int(now.day)
-    month_now=int(now.month)
-    year_now = now.year
-    weekday_now=now.weekday()
-
-    #数字が一桁の場合二けたにする
-    day_now=str(day_now)
-    month_now=str(month_now)
-    if len(day_now)==1:
-        day_now="0"+str(day_now)
-    if len(month_now)==1:
-        month_now="0"+str(month_now)
-    year_now=str(year_now)
-        
-    #NNへの学習を考慮して土曜:0,日曜:1,その他:2という区分けにする
-    weekday_sat=weekday_sun=weekday_oth=0
-    if weekday_now==5:
-        weekday_sat=1
-    elif weekday_now==6:
-        weekday_sun=1
-    else:
-        weekday_oth=1
-    ymd=year_now+month_now+day_now
-    return ymd,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth
-
-def read_csv(ymd):
-    #csvファイルを読み取りレースIDを抽出しURLを生成する
-    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
-    #テスト用
-    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250715_racetime.csv" 
-    df = pd.read_csv(path_1,index_col=False)
-    race_id=df["レースID"]
-    url_count=0
-    url_array=[]
-    while len(race_id)>url_count:
-        tmp_1=race_id[url_count]
-        url="https://race.netkeiba.com/race/shutuba.html?race_id="+str(tmp_1)
-        url_array.append(url)
-        url_count=url_count+1
-    return url_array
-
-def  get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth):
+def  get_and_prosees_data(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time):
     load_count=0
-    while len(url_array)>load_count:
-        print("ヘッダーの情報格納開始")
+    year_now=get_day_and_config.year_now
+    month_now=get_day_and_config.month_now
+    day_now=get_day_and_config.day_now
+    weekday_sat=get_day_and_config.weekday_sat
+    weekday_sun=get_day_and_config.weekday_sun
+    weekday_oth=get_day_and_config.weekday_oth
 
-        #本番用コード
-        load_url=url_array[load_count]
+    print("ヘッダーの情報格納開始")
 
-        #テスト用URL,本番時はマスクする
-        #G1
-        #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
-        #g2
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202505021212"
-        #g3
-        #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202510020411"
-        #L
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202508021211"
-        #op
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202505021111"
-        #jg1
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202506030711"
-        #jg2
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202508020708"
-        #jg3
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
-        #牝馬
-        #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
+    #テスト用URL,本番時はマスクする
+    #G1
+    #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202509030411"
+    #g2
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202505021212"
+    #g3
+    #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202510020411"
+    #L
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202508021211"
+    #op
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202505021111"
+    #jg1
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202506030711"
+    #jg2
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202508020708"
+    #jg3
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
+    #牝馬
+    #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
 
-        #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
-        load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202502011009"
-        url_array=[]
-        url_array.append(load_url)
+    #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
+    #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202502011009"
 
+    driver.get(load_url)
+
+    print("urlが読み込まれているかをチェックします。")
+    page_state=driver.execute_script("return document.readyState")
+    sleep(5)
+    while page_state=="complete":
+        print("url読み込み完了")
+        break
+    else:
+        print("URLの読み込みに失敗したため再読み込みします。")
         driver.get(load_url)
-
-        print("urlが読み込まれているかをチェックします。")
+        sleep(20)
         page_state=driver.execute_script("return document.readyState")
-        sleep(5)
-        while page_state=="complete":
-            print("url読み込み完了")
-            break
-        else:
-            print("URLの読み込みに失敗したため再読み込みします。")
-            driver.get(load_url)
-            sleep(20)
-            page_state=driver.execute_script("return document.readyState")
 
-        #webページから情報を取得する
-        print(load_url)
-        xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
-        xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
-        xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
-        
-        grade_dict={
-            "Icon_GradeType Icon_GradeType1": "G1",
-            "Icon_GradeType Icon_GradeType2": "G2",
-            "Icon_GradeType Icon_GradeType3": "G3",
-            "Icon_GradeType Icon_GradeType5": "OP",
-            "Icon_GradeType Icon_GradeType15": "L",
-            "Icon_GradeType Icon_GradeType10": "jG1",
-            "Icon_GradeType Icon_GradeType11": "jG2",
-            "Icon_GradeType Icon_GradeType12": "jG3",
-        }
+    #webページから情報を取得する
+    xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
+    xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
+    xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
+    
+    grade_dict={
+        "Icon_GradeType Icon_GradeType1": "G1",
+        "Icon_GradeType Icon_GradeType2": "G2",
+        "Icon_GradeType Icon_GradeType3": "G3",
+        "Icon_GradeType Icon_GradeType5": "OP",
+        "Icon_GradeType Icon_GradeType15": "L",
+        "Icon_GradeType Icon_GradeType10": "jG1",
+        "Icon_GradeType Icon_GradeType11": "jG2",
+        "Icon_GradeType Icon_GradeType12": "jG3",
+    }
 
-        #変数の初期化
-        header_data=[]
-        racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
-        racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
-        course_turf=course_dirt=course_jump=0
-        right_handed=left_handed=other_handed=0
-        course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=0
-        weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0.
-        baba_good=baba_light_good=baba_light_soft=baba_soft=0
-        old_3age=old_2age=old_3age_over=old_4age_over=0
-        only_hinba=0
-        weght_set=weght_level=weght_allowance=weght_handicap=0
-        grade=""
-        place_sapporo=place_hakodate=place_fukushima=place_nigata=place_nakayama=place_tokyo=place_chukyo=place_kyoto=place_hanshin=place_kokura=0
+    #変数の初期化
+    header_data=[]
+    racerank_shinba=racerank_nowin=racerank_1win=racerank_2win=racerank_3win=racerank_open=0
+    racegrade_g1=racegrade_g2=racegrade_g3=racegrade_l=racegrade_op=racegrade_jg1=racegrade_jg2=racegrade_jg3=0
+    course_turf=course_dirt=course_jump=0
+    right_handed=left_handed=other_handed=0
+    course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=0
+    weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0.
+    baba_good=baba_light_good=baba_light_soft=baba_soft=0
+    old_3age=old_2age=old_3age_over=old_4age_over=0
+    only_hinba=0
+    weght_set=weght_level=weght_allowance=weght_handicap=0
+    grade=""
+    place_sapporo=place_hakodate=place_fukushima=place_nigata=place_nakayama=place_tokyo=place_chukyo=place_kyoto=place_hanshin=place_kokura=0
 
-        #headerを取得
-        elements_1 = driver.find_elements(By.XPATH, xpath_1)
-        for elem_1 in elements_1:
-            hearder=elem_1.text.split()        
+    #headerを取得
+    elements_1 = driver.find_elements(By.XPATH, xpath_1)
+    for elem_1 in elements_1:
+        hearder=elem_1.text.split()        
 
-        #G1,G2等をアイコンのクラスから判別するため取り出す
-        elements_2 = driver.find_elements(By.XPATH, xpath_2)
-        for elem_2 in elements_2:
-            class_str = elem_2.get_attribute("class")    
+    #G1,G2等をアイコンのクラスから判別するため取り出す
+    elements_2 = driver.find_elements(By.XPATH, xpath_2)
+    for elem_2 in elements_2:
+        class_str = elem_2.get_attribute("class")    
 
-        #出走表を取得する
-        elements_3 = driver.find_elements(By.XPATH, xpath_3)
-        for elem_3 in elements_3:
-            maindata = elem_3.text.split("編集")
+    #出走表を取得する
+    elements_3 = driver.find_elements(By.XPATH, xpath_3)
+    for elem_3 in elements_3:
+        maindata = elem_3.text.split("編集")
 
-        # class属性の一覧を取得して変数に格納する
-        if len(elements_2)!=0 and (class_str in grade_dict):
-            grade=grade_dict[class_str]
-        
-        if grade=="G1":
-            racegrade_g1=1
-        elif grade=="G2":
-            racegrade_g2=1
-        elif grade=="G3":
-            racegrade_g3=1
-        elif grade=="L":
-            racegrade_l=1
-        elif grade=="OP":
-            racegrade_op=1
-        elif grade=="jG1":
-            racegrade_jg1=1
-        elif grade=="jG2":
-            racegrade_jg2=1
-        elif grade=="jG3":   
-            racegrade_jg3=1
+    # class属性の一覧を取得して変数に格納する
+    if len(elements_2)!=0 and (class_str in grade_dict):
+        grade=grade_dict[class_str]
+    
+    if grade=="G1":
+        racegrade_g1=1
+    elif grade=="G2":
+        racegrade_g2=1
+    elif grade=="G3":
+        racegrade_g3=1
+    elif grade=="L":
+        racegrade_l=1
+    elif grade=="OP":
+        racegrade_op=1
+    elif grade=="jG1":
+        racegrade_jg1=1
+    elif grade=="jG2":
+        racegrade_jg2=1
+    elif grade=="jG3":   
+        racegrade_jg3=1
 
         while len(hearder)!=0:
             check_1=hearder[0]
@@ -396,7 +350,11 @@ def  get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekd
     #配列を要素に分割する
     maindata_count=0
     total_array=[]
-    data_colme=["レースID","年","月","日","土曜日","日曜日","その他","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","美浦","栗東","海外","調教師","調教師ID","馬体重","増減"]
+    data_colme=["レースID","年","月","日","土曜日","日曜日","その他","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3",
+                "芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場",
+                "右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不",
+                "3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量",
+                "騎手","騎手ID","美浦","栗東","海外","調教師","調教師ID","馬体重","増減","単勝オッズ","最低複勝オッズ","最高複勝オッズ","単勝人気","オッズ取得時刻"]
     print("出走馬の情報を取得開始")
     total_array.append(data_colme)
     match_11=r"\s*(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]?\d+|前計不)\)"
@@ -461,7 +419,9 @@ def  get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekd
                 #変数を入れ配列を作成する
                 maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
                                 int(horse_age),float(assigned_weight),jockey,kopckey_id,belong_east,belong_west,belong_oversea,
-                                trainer,trainer_id,int(horse_weight),int(weight_change)]
+                                trainer,trainer_id,int(horse_weight),int(weight_change),
+                                odds_win,min_odds_place,max_odds_place,odds_rank,win_time
+                                ]
                 add_array=header_data+maindate_array
                 total_array.append(add_array)
                 maindata_count=maindata_count+1
@@ -477,7 +437,8 @@ def  get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekd
     print("情報取得完了!!")
     return total_array,race_id
 
-def export_csv(total_array,race_id,ymd):
+def export_csv(total_array,race_id):
+    ymd=get_day_and_config.ymd
     print("csvに出力開始")
     path_1="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+str(race_id)+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)
