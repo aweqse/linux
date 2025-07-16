@@ -161,7 +161,7 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
             now = datetime.now()
             hour = now.hour
             minute = now.minute
-            wide_time=hour*60+minute
+            win_time=hour*60+minute
             print("単勝・複勝の情報取得完了")
             
             #単勝,複勝の情報を加工する
@@ -182,7 +182,7 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
                 check_1=wide_ele[wide_count]
                 odds_rank=check_1[0]
                 umaban=check_1[2]
-                odds_wide=check_1[4]
+                odds_win=check_1[4]
                 min_odds_place=check_1[5]
                 max_odds_place=check_1[6]
                 
@@ -196,7 +196,7 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
                 
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
-                cache_1_array=[int(race_id),before_30min_flg,before_10min_flg,before_5min_flg,int(umaban),float(odds_wide),float(min_odds_place),float(max_odds_place),int(odds_rank),wide_time]
+                cache_1_array=[int(race_id),before_30min_flg,before_10min_flg,before_5min_flg,int(umaban),float(odds_win),float(min_odds_place),float(max_odds_place),int(odds_rank),win_time]
                 if header_flg==0:
                     wide_export_array.append(header_1)
                     header_flg=1
@@ -206,7 +206,7 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
             #racedate10分前の場合,racedataを作成する
             if before_10min_flg==1:
                 load_url=racedata_dict[hour_min]
-                get_racedata.main(load_url,odds_wide,min_odds_place,max_odds_place,odds_rank,wide_time)
+                get_racedata.main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
 
             #csvに出力する
             if before_30min_flg==1:

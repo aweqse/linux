@@ -21,8 +21,8 @@ options.add_argument('--no-sandbox')
 
 driver = webdriver.Chrome(options=options)
 
-def main():
-    total_array,race_id=get_and_prosees_data()
+def main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time):
+    total_array,race_id=get_and_prosees_data(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
     export_csv(total_array,race_id)
 
 def  get_and_prosees_data(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time):
