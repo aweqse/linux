@@ -22,9 +22,9 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    ymd=get_datetime()
+    ymd,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth=get_datetime()
     url_array=read_csv(ymd)
-    total_array,race_id=get_and_prosees_data(url_array)
+    total_array,race_id=get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth)
     export_csv(total_array,race_id,ymd)
 
 #現在の日にちと曜日を取得する
@@ -45,20 +45,21 @@ def get_datetime():
     year_now=str(year_now)
         
     #NNへの学習を考慮して土曜:0,日曜:1,その他:2という区分けにする
+    weekday_sat=weekday_sun=weekday_oth=0
     if weekday_now==5:
-        weekday_now=0
+        weekday_sat=1
     elif weekday_now==6:
-        weekday_now=1
+        weekday_sun=1
     else:
-        weekday_now=2
+        weekday_oth=1
     ymd=year_now+month_now+day_now
-    return ymd
+    return ymd,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth
 
 def read_csv(ymd):
     #csvファイルを読み取りレースIDを抽出しURLを生成する
     path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+ymd+"_racetime.csv"
     #テスト用
-    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250706_racetime.csv" 
+    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250715_racetime.csv" 
     df = pd.read_csv(path_1,index_col=False)
     race_id=df["レースID"]
     url_count=0
@@ -70,7 +71,7 @@ def read_csv(ymd):
         url_count=url_count+1
     return url_array
 
-def  get_and_prosees_data(url_array):
+def  get_and_prosees_data(url_array,year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth):
     load_count=0
     while len(url_array)>load_count:
         print("ヘッダーの情報格納開始")
@@ -97,9 +98,11 @@ def  get_and_prosees_data(url_array):
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202510010708"
         #牝馬
         #load_url="https://race.netkeiba.com/race/result.html?race_id=202505010511"
+
         #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
-        #url_array=[]
-        #url_array.append(load_url)
+        load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202502011009"
+        url_array=[]
+        url_array.append(load_url)
 
         driver.get(load_url)
 
@@ -372,6 +375,7 @@ def  get_and_prosees_data(url_array):
         #変数の初期化
         header_data=[
         race_id,
+        year_now,month_now,day_now,weekday_sat,weekday_sun,weekday_oth,
         racerank_shinba,racerank_nowin,racerank_1win,racerank_2win,racerank_3win,racerank_open,
         racegrade_g1,racegrade_g2,racegrade_g3,racegrade_l,racegrade_op,racegrade_jg1,racegrade_jg2,racegrade_jg3,
         course_turf,course_dirt,course_jump,
@@ -392,10 +396,11 @@ def  get_and_prosees_data(url_array):
     #配列を要素に分割する
     maindata_count=0
     total_array=[]
-    data_colme=["レースID","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","美浦","栗東","海外","調教師","調教師ID","馬体重","増減"]
+    data_colme=["レースID","年","月","日","土曜日","日曜日","その他","新馬","未勝利","1勝クラス","2勝クラス","3勝クラス","オープン","G1","G2","G3","L","OP","JG1","JG2","JG3","芝","ダート","障害","距離","札幌競馬場","函館競馬場","福島競馬場","新潟競馬場","中山競馬場","東京競馬場","中京競馬場","京都競馬場","阪神競馬場","小倉競馬場","右","左","その他","A","B","C","D","外","内","2周","晴","曇","小雨","雨","小雪","雪","天候:その他","良","稍","重","不","3歳","2歳","3歳以上","4歳以上","牝馬限定戦","馬齢","定量","別定","ハンデ","頭数","枠番","馬番","馬名","馬ID","牡馬","牝馬","騙馬","馬齢","斤量","騎手","騎手ID","美浦","栗東","海外","調教師","調教師ID","馬体重","増減"]
     print("出走馬の情報を取得開始")
     total_array.append(data_colme)
-    match_11=r"\s*(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]?\d+)\)"
+    match_11=r"\s*(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]?\d+|前計不)\)"
+    match_12=r"\s*(\d+)\s+(\d+)\s+(除外|取消)?\s*([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)?\s*([^\s]+)?\s*(栗東|美浦|海外)?([^\s]+)?"
     
     while len(maindata)>maindata_count:
         #変数の初期化
@@ -411,51 +416,60 @@ def  get_and_prosees_data(url_array):
             #余計な文字を空白に置き換えてまとめて削除して要素に分割する
             check_2 = check_2.replace("--", " ").replace("\n", " ")
             re_match=re.match(match_11,str(check_2))
+            re_match_2=re.match(match_12,str(check_2))
 
-            wakuban=re_match.group(1)
-            umaban=re_match.group(2)
-            horse_name=re_match.group(3)
+            #除外,取消がないい場合は通常の処理、ある場合はスキップする
+            if re_match:
+                wakuban=re_match.group(1)
+                umaban=re_match.group(2)
+                horse_name=re_match.group(3)
 
-            #horse_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
-            horse_id=-10
-            
-            sex=re_match.group(4)
-            if sex=="牡":
-                sex_male=1
-            elif sex=="牝":
-                sex_female=1
-            elif sex=="セ":
-                sex_gelding=1
-            horse_old=re_match.group(5)
-            horse_weighgt=re_match.group(6)
-            jockey=re_match.group(7)
+                #horse_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+                horse_id=-10
+                
+                sex=re_match.group(4)
+                if sex=="牡":
+                    sex_male=1
+                elif sex=="牝":
+                    sex_female=1
+                elif sex=="セ":
+                    sex_gelding=1
+                horse_age=re_match.group(5)
+                assigned_weight=re_match.group(6)
+                jockey=re_match.group(7)
 
-            #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
-            kopckey_id=-10
+                #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+                kopckey_id=-10
 
-            belong_trainer=re_match.group(8)
-            if belong_trainer=="美浦":
-                belong_east=1
-            elif belong_trainer=="栗東":
-                belong_west=1
-            elif belong_trainer=="海外":
-                belong_oversea=1
-            trainer=re_match.group(9)
+                belong_trainer=re_match.group(8)
+                if belong_trainer=="美浦":
+                    belong_east=1
+                elif belong_trainer=="栗東":
+                    belong_west=1
+                elif belong_trainer=="海外":
+                    belong_oversea=1
+                trainer=re_match.group(9)
 
-            #trainer_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
-            trainer_id=-10
+                #trainer_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
+                trainer_id=-10
+        
+                horse_weight=re_match.group(10)
+                if horse_weight=="前計不":
+                    horse_weight=-1
+                weight_change=re_match.group(11)
 
-            horse_weight=re_match.group(10)
-            weight_change=re_match.group(11)
+                #変数を入れ配列を作成する
+                maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
+                                int(horse_age),float(assigned_weight),jockey,kopckey_id,belong_east,belong_west,belong_oversea,
+                                trainer,trainer_id,int(horse_weight),int(weight_change)]
+                add_array=header_data+maindate_array
+                total_array.append(add_array)
+                maindata_count=maindata_count+1
+                continue
+            elif re_match_2:
+                maindata_count=maindata_count+1
+                continue
 
-            #変数を入れ配列を作成する
-            maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
-                            int(horse_old),float(horse_weighgt),jockey,kopckey_id,belong_east,belong_west,belong_oversea,
-                            trainer,trainer_id,int(horse_weight),int(weight_change)]
-            add_array=header_data+maindate_array
-            total_array.append(add_array)
-            maindata_count=maindata_count+1
-            continue
 
     print("要素の分離と配列の格納完了")
     #chromeを閉じる

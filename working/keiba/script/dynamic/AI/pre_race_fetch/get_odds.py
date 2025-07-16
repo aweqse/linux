@@ -59,7 +59,8 @@ def read_csv(ymd):
     #csvファイルを読み取りレースIDを抽出しURLを生成する
     path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/"+str(ymd)+"/get_racetime.csv"
     #テスト用
-    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250706_racetime.csv" 
+    path_1="/home/aweqse/dev/working/keiba/output/pre_odds_csv/20250713_racetime.csv" 
+    
     df = pd.read_csv(path_1,index_col=False)
     
     #カラム名を配列に格納して時刻とオッズURLを辞書型にする
