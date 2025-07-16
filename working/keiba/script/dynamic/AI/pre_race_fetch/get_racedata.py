@@ -160,9 +160,9 @@ def  get_and_prosees_data(load_url,odds_win,min_odds_place,max_odds_place,odds_r
                 if course=="芝":
                     course_turf=1
                 elif course=="ダ":
-                    course_dirt
+                    course_dirt=1
                 else:
-                    course_jump
+                    course_jump=1
                 del hearder[0]
                 continue
 
@@ -278,7 +278,7 @@ def  get_and_prosees_data(load_url,odds_win,min_odds_place,max_odds_place,odds_r
                 if rank=="新馬":
                     racerank_shinba=1
                 elif rank=="未勝利":
-                    racerank_nowin
+                    racerank_nowin=1
                 elif rank=="１勝クラス":
                     racerank_1win=1                
                 elif rank=="２勝クラス":
@@ -445,4 +445,13 @@ def export_csv(total_array,race_id):
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")
 
-main()
+if __name__ == "__main__":
+    # テスト用のダミーデータ
+    load_url = "https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
+    odds_win = 3.4
+    min_odds_place = 1.8
+    max_odds_place = 2.6
+    odds_rank = 2
+    win_time = 10  # オッズ取得時刻（例：発走10分前）
+
+main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
