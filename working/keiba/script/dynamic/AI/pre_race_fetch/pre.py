@@ -75,7 +75,7 @@ while len(day_elem)>day_count:
     day_count=day_count+1
 
 #テスト用
-#md="0713"
+md="0713"
 
 if md in check_array:
     mkdir_path="/home/aweqse/dev/working/keiba/output/"+ymd
@@ -85,6 +85,7 @@ if md in check_array:
     
     #生成したファイルを格納するフォルダを作る
     subprocess.run(["mkdir",mkdir_path])
+    
     subprocess.run(["python3",path_1])
     subprocess.run(["python3",path_2])
     subprocess.run(["python3",path_3])
