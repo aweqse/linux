@@ -59,6 +59,10 @@ while len(day_elem)>day_count:
 
 #今日がレース日かを判定する
 md=get_day_and_config.md
+
+#テスト用パラメーター
+md="0713"
+
 if md in check_array:
     mkdir_path_1=get_day_and_config.mkdir_path_1
     mkdir_path_2=get_day_and_config.mkdir_path_2
