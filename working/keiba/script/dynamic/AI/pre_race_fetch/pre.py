@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 import re
 import sys
 import subprocess
+import get_day_and_config
 
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
@@ -21,24 +22,7 @@ options.add_argument('--no-sandbox')
 
 driver = webdriver.Chrome(options=options)
 
-now = datetime.now()
-day_now=int(now.day)
-month_now=int(now.month)
-year_now = now.year
-weekday_now=now.weekday()
-
-#数字が一桁の場合二けたにする
-day_now=str(day_now)
-month_now=str(month_now)
-if len(day_now)==1:
-    day_now="0"+str(day_now)
-if len(month_now)==1:
-    month_now="0"+str(month_now)
-year_now=str(year_now)
-ymd=year_now+month_now+day_now
-md=month_now+day_now
-
-#今日がレースの日なのかを判定する
+#今日がレースの日なのかを判定するための情報を取得する
 load_url="https://race.netkeiba.com/top/"
 xpath_day="/html/body/div[1]/div/div[1]/div[5]/div[2]/div/div[1]/ul"
 driver.get(load_url)
@@ -52,7 +36,6 @@ else:
     driver.get(load_url)
     sleep(10)
     page_state=driver.execute_script("return document.readyState")
-
 
 #要素を変数に格納する
 elements_day = driver.find_elements(By.XPATH, xpath_day)
@@ -74,22 +57,27 @@ while len(day_elem)>day_count:
     check_array.append(check_4)
     day_count=day_count+1
 
-#テスト用
-md="0713"
-
+#今日がレース日かを判定する
+md=get_day_and_config.md
 if md in check_array:
-    mkdir_path="/home/aweqse/dev/working/keiba/output/"+ymd
-    path_1="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_racetime.py"
-    path_2="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_racedata.py"
-    path_3="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
-    
+    mkdir_path_1=get_day_and_config.mkdir_path_1
+    mkdir_path_2=get_day_and_config.mkdir_path_2
+    mkdir_path_3=get_day_and_config.mkdir_path_3
+    mkdir_path_4=get_day_and_config.mkdir_path_4
+    py_path_1=get_day_and_config.py_path_1
+    py_path_2=get_day_and_config.py_path_2
+
     #生成したファイルを格納するフォルダを作る
-    subprocess.run(["mkdir",mkdir_path])
+    subprocess.run(["mkdir",mkdir_path_1])
+    subprocess.run(["mkdir",mkdir_path_2])
+    subprocess.run(["mkdir",mkdir_path_3])
+    subprocess.run(["mkdir",mkdir_path_4])
     
-    subprocess.run(["python3",path_1])
-    subprocess.run(["python3",path_2])
-    subprocess.run(["python3",path_3])
+    #プログラムを起動する
+    subprocess.run(["python3",py_path_1])
+    subprocess.run(["python3",py_path_2])
 
 else:
     print("競馬の開催日ではないのでプログラムを終了します")
     sys.exit()
+
