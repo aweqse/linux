@@ -65,7 +65,8 @@ def get_element():
         for check in temp:
             if any(word in check for word in sub_check_word) or (check in match_check_word):
                 starttime_array.append(check)
-        return starttime_array,match_check_word
+                
+    return starttime_array,match_check_word
 
 def process_date(starttime_array,match_check_word):
     #30分前、10分前,5分前の時刻を算出して◯R→３０分目時刻、１０分目時刻、５分目時刻の順に配列を格納し直す最終的には[年、月、日、レースid(year+month+day+_二桁のレース番号),開催上（数字）,レース数（数字）,30分前オッズ,10分前オッス,５分前オッズ]にする        

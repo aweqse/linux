@@ -80,6 +80,7 @@ if md in check_array:
     #プログラムを起動する
     subprocess.run(["python3",py_path_1])
     subprocess.run(["python3",py_path_2])
+    subprocess.run(["pkill","chrome"])
 
 else:
     print("競馬の開催日ではないのでプログラムを終了します")

@@ -25,8 +25,8 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict=read_csv()
-    get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict)
+    win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id=read_csv()
+    get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id)
 
 
 def read_csv():
@@ -46,7 +46,7 @@ def read_csv():
     before_5min=df["発送時刻5分前"]
 
     #カラム名を配列に格納して時刻とオッズURLを辞書型にする
-    wide_url="https://race.netkeiba.com/odds/index.html?race_id="
+    win_url="https://race.netkeiba.com/odds/index.html?race_id="
     umaren_url_1="https://race.netkeiba.com/odds/index.html?type=b4&race_id="
     wide_url_1="https://race.netkeiba.com/odds/index.html?type=b5&race_id="
     sanrenpuku_url_1="https://race.netkeiba.com/odds/index.html?type=b7&race_id="
@@ -54,7 +54,7 @@ def read_csv():
     url_2="&housiki=c99"
 
     #urlの生成
-    wide_url_araay=[wide_url+ str(s) for s in race_id]
+    win_url_araay=[win_url+ str(s) for s in race_id]
     umaren_url_array=[umaren_url_1 + str(s) + url_2 for s in race_id]
     wide_url_1array=[wide_url_1 + str(s) + url_2 for s in race_id]
     sanrenpuku_url_1_array=[sanrenpuku_url_1 + str(s) + url_2 for s in race_id]
@@ -63,86 +63,143 @@ def read_csv():
 
     print("辞書の作成開始")
     umaren_array={}
+    win_array={}
     wide_array={}
-    wide_1array={}
     sanrenpuku_array={}
 
     #キーが同じ値だと上書きされるため時間とURLは別々で生成する
     #30分前
-    before_30min_wide=dict(zip(before_30min, wide_url_araay))
+    before_30min_win=dict(zip(before_30min, win_url_araay))
     before_30min_umaren=dict(zip(before_30min, umaren_url_array))
     before_30min_wide=dict(zip(before_30min, wide_url_1array))
     before_30min_sanrenpuku=dict(zip(before_30min, sanrenpuku_url_1_array))
 
     #10分前
-    before_10min_wide=dict(zip(before_10min, wide_url_araay))
+    before_10min_win=dict(zip(before_10min, win_url_araay))
     before_10min_umaren=dict(zip(before_10min, umaren_url_array))
     before_10min_wide=dict(zip(before_10min, wide_url_1array))
     before_10min_sanrenpuku=dict(zip(before_10min, sanrenpuku_url_1_array))
     racedata_dict=dict(zip(before_10min, racedate_url_array))
 
     #5分前
-    before_5min_wide=dict(zip(before_5min, wide_url_araay))
+    before_5min_win=dict(zip(before_5min, win_url_araay))
     before_5min_umaren=dict(zip(before_5min, umaren_url_array))
     before_5min_wide=dict(zip(before_5min, wide_url_1array))
     before_5min_sanrenpuku=dict(zip(before_5min, sanrenpuku_url_1_array))
 
     #辞書の統合
-    wide_array = {**before_30min_wide, **before_10min_wide,**before_5min_wide}
+    win_array = {**before_30min_win, **before_10min_win,**before_5min_win}
     umaren_array = {**before_30min_umaren, **before_10min_umaren,**before_5min_umaren}
     wide_1array = {**before_30min_wide, **before_10min_wide,**before_5min_wide}
     sanrenpuku_array = {**before_30min_sanrenpuku, **before_10min_sanrenpuku,**before_5min_sanrenpuku}
     print("辞書の作成完了")
-    return wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict
+    return win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id
 
-def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,racedata_dict):
+def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id):
     ymd=get_day_and_config.ymd
-    #パスを定義する
-    xpath_wide=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"
-    xpath_umaren=      "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
-    xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
-    xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
-    xpath_prudown=     "/html/body/div[1]/div[3]/div[2]/div[1]/div[2]/div/select"
-    before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+race_id+ "_wide_place_odds.csv"
-    before_30min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+race_id+ "_umaren_odds.csv"
-    before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+race_id+ "_wide_odds.csv"
-    before_30min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+race_id+ "_sanrenpuku_odds.csv"
-    before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+race_id+ "_wide_place_odds.csv"
-    before_10min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+race_id+ "_umaren_odds.csv"
-    before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+race_id+ "_wide_odds.csv"
-    before_10min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+race_id+ "_sanrenpuku_odds.csv"
-    before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+race_id+ "_wide_place_odds.csv"
-    before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+race_id+ "_umaren_odds.csv"
-    before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+race_id+ "_wide_odds.csv"
-    before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+race_id+ "_sanrenpuku_odds.csv"
-
+    
     #初期値
     hour_min=get_day_and_config.hour_min
+
+    #テスト用パラメーター
+    hour_min_array=[
+                    580,    600,    605,    610,
+                    615,    635,	640,	645,
+                    645,	665,	670,	675,
+                    675,	695,	700,	705,
+                    725,	745,	750,	755,
+                    755,	775,	780,	785,
+                    785,	805,	810,	815,
+                    815,	835,	840,	845,
+                    845,	865,	870,	875,
+                    880,	900,	905,	910,
+                    915,	935,	940,	945,
+                    960,	980,	985,	990,
+                    571,	591,	596,    601,
+                    605,	625,	630,	635,
+                    635,	655,	660,	665,
+                    665,	685,	690,	695,
+                    715,	735,	740,	745,
+                    745,	765,	770,	775,
+                    775,	795,	800,	805,
+                    805,	825,	830,	835,
+                    835,	855,	860,	865,
+                    871,	891,	896,	901,
+                    905,	925,	930,	935,
+                    945,	965,	970,	975,
+                    560,	580,	585,	590,
+                    595,	615,	620,	625,
+                    625,	645,	650,	655,
+                    655,	675,	680,	685,
+                    705,	725,	730,	735,
+                    735,	755,	760,	765,
+                    765,	785,	790,	795,
+                    795,	815,	820,	825,
+                    825,	845,	850,	855,
+                    860,	880,	885,	890,
+                    895,	915,	920,	925,
+                    935,	955,	960,	965,
+]
+    hour_min_array_count=0
+    hour_min=hour_min_array[hour_min_array_count]
+
+        #いつの時間の情報なのか判断するために配列の中身を乗り出して判定する
+    before_30min_array=before_30min.tolist()
+    before_10min_array=before_10min.tolist()
+    before_5min_array=before_5min.tolist()
+    race_id=race_id.tolist()
+    race_id_count=0
+
     while hour_min<1020:
-        hour_min=get_day_and_config.hour_min
+        #本番は以下のコメントアウトを外す
+        #hour_min=get_day_and_config.hour_min
 
         #テスト用
         #hour_min=615
+
+        while (hour_min in before_30min_array) or (hour_min in before_10min_array) or (hour_min in before_5min_array):
+            
+            #race_idを取り出す
+            str_race_id=race_id[race_id_count]
+
+            #パスを定義する
+            xpath_win=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"
+            xpath_umaren=      "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            xpath_prudown=     "/html/body/div[1]/div[3]/div[2]/div[1]/div[2]/div/select"
+            before_30min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_30min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_30min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_10min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_place_odds.csv"
+            before_10min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_10min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_wide_place_odds.csv"
+            before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+
         
-        while (hour_min in umaren_array):
             before_30min_flg=before_10min_flg=before_5min_flg=0
             if (hour_min in before_30min_array):
                 before_30min_flg=1
             elif (hour_min in before_10min_array):
                 before_10min_flg=1
-            else:
+            elif (hour_min in before_5min_array):
                 before_5min_flg=1  
 
             print("処理を開始します。")
             #urlの読み込み
-            load_url_wide=wide_array[hour_min]
+            load_url_win=win_array[hour_min]
             load_url_umaren=umaren_array[hour_min]
             load_url_wide=wide_1array[hour_min]
             load_url_sanrenpuku=sanrenpuku_array[hour_min]
 
             #単勝・複勝のオッズを取得する
             print("単勝・複勝の情報取得開始")
-            driver.get(load_url_wide)
+            driver.get(load_url_win)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
             while page_state=="complete":
@@ -150,12 +207,12 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
                 break
             else:
                 print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_wide)
+                driver.get(load_url_win)
                 sleep(10)
                 page_state=driver.execute_script("return document.readyState")
             
             #要素を変数に格納する
-            elements_wide = driver.find_elements(By.XPATH, xpath_wide)
+            elements_win = driver.find_elements(By.XPATH, xpath_win)
             
             #単勝の取得時刻を取得する
             now = datetime.now()
@@ -166,42 +223,38 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
             
             #単勝,複勝の情報を加工する
             print("単勝の処理開始")
-            for elem_1 in elements_wide:
-                wide_ele=elem_1.text.replace("\n","")
+            for elem_1 in elements_win:
+                win_ele=elem_1.text.replace("\n","")
 
             #配列の加工
             split_match=r"(\d+)\s(\d+)\s(\d+)([^\d\s]+)\s(\d+\.\d)\s(\d+\.\d)\s*-\s*(\d+\.\d)"
-            wide_ele=re.findall(split_match,wide_ele)
-            wide_count=0
+            win_ele=re.findall(split_match,win_ele)
+            win_count=0
 
             #変数の初期化
-            wide_export_array=[]
+            win_export_array=[]
             cache_1_array=[]
             header_flg=0
-            while len(wide_ele)>wide_count:
-                check_1=wide_ele[wide_count]
+            while len(win_ele)>win_count:
+                check_1=win_ele[win_count]
                 odds_rank=check_1[0]
                 umaban=check_1[2]
                 odds_win=check_1[4]
                 min_odds_place=check_1[5]
                 max_odds_place=check_1[6]
-                
-                #いつの時間の情報なのか判断するために配列の中身を乗り出して判定する
-                before_30min_array=before_30min.tolist()
-                before_10min_array=before_10min.tolist()
-                
-                wide_match=r"(\d+)$"
-                match=re.search(wide_match,load_url_wide)
+                                
+                win_match=r"(\d+)$"
+                match=re.search(win_match,load_url_win)
                 race_id=match.group(1) 
                 
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
                 cache_1_array=[int(race_id),before_30min_flg,before_10min_flg,before_5min_flg,int(umaban),float(odds_win),float(min_odds_place),float(max_odds_place),int(odds_rank),win_time]
                 if header_flg==0:
-                    wide_export_array.append(header_1)
+                    win_export_array.append(header_1)
                     header_flg=1
-                wide_export_array.append(cache_1_array)
-                wide_count=wide_count+1
+                win_export_array.append(cache_1_array)
+                win_count=win_count+1
             
             #racedate10分前の場合,racedataを作成する
             if before_10min_flg==1:
@@ -210,13 +263,13 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
 
             #csvに出力する
             if before_30min_flg==1:
-                csv_path_1=before_30min_wide_path
+                csv_path_1=before_30min_win_path
             elif before_10min_flg==1:
-                csv_path_1=before_10min_wide_path
+                csv_path_1=before_10min_win_path
             elif before_5min_flg==1:
-                csv_path_1=before_5min_wide_path
+                csv_path_1=before_5min_win_path
  
-            df_2=pd.DataFrame(wide_export_array)
+            df_2=pd.DataFrame(win_export_array)
             df_2.to_csv(csv_path_1, index=False, header=False, encoding='utf-8-sig')           
             print("単勝と複勝の処理完了")
 
@@ -479,6 +532,11 @@ def get_odds(wide_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,b
             print("取得が完了したので待機します")
             sleep(60)
             hour_min=get_day_and_config.hour_min
+            race_id_count=race_id_count+1
+
+            #テスト用
+            hour_min_array_count=hour_min_array_count+1
+            hour_min=hour_min_array[hour_min_array_count]
 
         print("該当時刻ではないので待機します")
         sleep(20)
