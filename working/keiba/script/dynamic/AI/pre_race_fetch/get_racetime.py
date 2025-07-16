@@ -5,7 +5,7 @@ from time import sleep
 import re
 import csv
 import subprocess
-
+import get_day_and_config
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
 
@@ -22,58 +22,21 @@ options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def main():
-    datetime_array,ymd=get_datetime()
-    load_url,day, month, year, week_now =get_url(datetime_array)
-    wait_page(load_url)
     starttime_array,match_check_word=get_element()
-    alltime_array=process_date(starttime_array,match_check_word,day,month, year, week_now )
-    export_csv(alltime_array,ymd)
+    alltime_array=process_date(starttime_array,match_check_word)
+    export_csv(alltime_array)
 
-#現在の日にちと曜日を取得する
-def get_datetime():
-    now = datetime.now()
-    day_now=int(now.day)
-    month_now=int(now.month)
-    year_now = now.year
-    weekday_now=now.weekday()
-
-    #数字が一桁の場合二けたにする
-    day_now=str(day_now)
-    month_now=str(month_now)
-    if len(day_now)==1:
-        day_now="0"+str(day_now)
-    if len(month_now)==1:
-        month_now="0"+str(month_now)
-    year_now=str(year_now)
-        
-    #NNへの学習を考慮して土曜:0,日曜:1,その他:2という区分けにする
-    if weekday_now==5:
-        weekday_now=0
-    elif weekday_now==6:
-        weekday_now=1
-    else:
-        weekday_now=2
-
-    ymd=year_now+month_now+day_now
-    datetime_array=[day_now,month_now,year_now,weekday_now]
-    return datetime_array,ymd
 
 #発送時刻を取得し加工する
-def get_url(datetime_array):
-    #日値を取り出してULRを生成する
-    day, month, year, week_now = datetime_array
-
+def get_element():
     #urlのため曜日を結合する
-    url_str=year+month+day
-    load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date="+url_str
+    ymd=get_day_and_config.ymd
+    load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date="+ymd
     
     #テスト用のURL
     load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date=20250713"
 
     driver.get(load_url)
-    return load_url,day, month, year, week_now 
-
-def wait_page(load_url):
     #ページが読み込まれているかチェックする
     print("urlが読み込まれているかをチェックします。")
     page_state=driver.execute_script("return document.readyState")
@@ -87,7 +50,6 @@ def wait_page(load_url):
         sleep(20)
         page_state=driver.execute_script("return document.readyState")
 
-def get_element():
     print("レースタイムの取得開始")
     path_1='//*[@class="RaceList_Box clearfix"]'
     elements = driver.find_elements(By.XPATH, path_1)
@@ -170,7 +132,8 @@ def process_date(starttime_array,match_check_word,day, month, year, week_now ):
     print("レースタイムの取得完了")
     return alltime_array
     
-def export_csv(alltime_array,ymd):
+def export_csv(alltime_array):
+    ymd=get_day_and_config.ymd
     #path="/home/aweqse/"+ymd+"_racetime.csv"
     path="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+ymd+"_racetime.csv"
     #path="C:\\workspace\\プログラム\\競馬\\AI\\"+ymd+"_racetime.csv"
