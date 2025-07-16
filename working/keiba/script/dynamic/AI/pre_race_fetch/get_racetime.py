@@ -67,7 +67,7 @@ def get_element():
                 starttime_array.append(check)
         return starttime_array,match_check_word
 
-def process_date(starttime_array,match_check_word,day, month, year, week_now ):
+def process_date(starttime_array,match_check_word):
     #30分前、10分前,5分前の時刻を算出して◯R→３０分目時刻、１０分目時刻、５分目時刻の順に配列を格納し直す最終的には[年、月、日、レースid(year+month+day+_二桁のレース番号),開催上（数字）,レース数（数字）,30分前オッズ,10分前オッス,５分前オッズ]にする        
     #競馬場を配列の先頭に追加する
     split_count=0
@@ -121,6 +121,9 @@ def process_date(starttime_array,match_check_word,day, month, year, week_now ):
             #発送時刻を変数に格納する
             starttime=int(hour)*60+int(minute)
             #race_idを生成する
+            year=get_day_and_config.year_now
+            month=get_day_and_config.month_now
+            day=get_day_and_config.day_now
             race_id=year+place_cache+kai+nitime+race
 
             #配列に挿入する
