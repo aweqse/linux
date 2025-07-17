@@ -61,13 +61,14 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
     #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
     #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202502011009"
 
+    #参考記述
+    xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
+    xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
+    xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
 
     #webページから情報を取得する
-    xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
     class_path_1="RaceList_Item02"
-    xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
     class_path_2="Icon_GradeType"
-    xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
     class_path_3="RaceTableArea"
     print("urlが読み込まれているかをチェックします。")
     
@@ -130,7 +131,7 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
     place_sapporo=place_hakodate=place_fukushima=place_nigata=place_nakayama=place_tokyo=place_chukyo=place_kyoto=place_hanshin=place_kokura=0
 
     #headerを取得
-    elements_1 = driver.find_elements(By.CLASS_NAME, class_path_1)
+    elements_1 = driver.find_elements(By.CLASS_NAME, class_path_1)#完全一致の書き方
     for elem_1 in elements_1:
         hearder=elem_1.text.split()        
 

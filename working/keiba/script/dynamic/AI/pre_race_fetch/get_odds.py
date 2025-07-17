@@ -200,12 +200,18 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #race_idを取り出す
             str_race_id=load_url_win[-12:]
 
-            #パスを定義する
-            xpath_win=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"
+            #参考
+            xpath_win=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"    
             xpath_umaren=      "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
-            xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"     
             xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
-            xpath_prudown=     "/html/body/div[1]/div[3]/div[2]/div[1]/div[2]/div/select"
+            
+            xpath_prudown=     "Axis_Horse_selectbox"
+            class_path_win_place="RaceOdds_HorseList_Table" #他候補　"Ninki"
+            class_path_umaren= "Odds_Type_b4" #他候補"RaceOdds_HorseList_Table" "Ninki"
+            class_path_wide="Odds_Type_b5" #他候補"RaceOdds_HorseList_Table" "Ninki" 
+            class_path_sanrenpuku="Odds_Type_b7" #他候補　"RaceOdds_HorseList_Table" "Ninki" 
+                    
             before_30min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_win_place_odds.csv"
             before_30min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
             before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
@@ -230,14 +236,14 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 print("url読み込み完了")
                 #xpathが完全に読み込まれるまで待機する
                 WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, xpath_win)))
+                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")))
             else:
                 while True:
                     print("URLの読み込みに失敗したため再読み込みします。")
                     driver.get(load_url_win)
                     sleep(10)
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, xpath_win)))
+                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")))
                     page_state=driver.execute_script("return document.readyState")
                     if page_state=="complete":
                         break
@@ -245,7 +251,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                         continue
             
             #要素を変数に格納する
-            elements_win = driver.find_elements(By.XPATH, xpath_win)
+            elements_win = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")
             
             #単勝の取得時刻を取得する
             win_time=get_day_and_config.hour_min
@@ -313,20 +319,27 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             driver.get(load_url_umaren)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
-            while page_state=="complete":
+            if page_state=="complete":
                 print("url読み込み完了")
                 #xpathが完全に読み込まれるまで待機する
                 WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, xpath_umaren)))
-                break
+                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")))
             else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_umaren)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
+                while True:
+                    print("URLの読み込みに失敗したため再読み込みします。")
+                    driver.get(load_url_win)
+                    sleep(10)
+                    WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")))
+                    page_state=driver.execute_script("return document.readyState")
+                    if page_state=="complete":
+                        break
+                    else:
+                        continue
+            
             
             #要素を変数に格納する
-            elements_umaren = driver.find_elements(By.XPATH, xpath_umaren)
+            elements_umaren = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")
             
             #馬連の取得時効を取得する
             now = datetime.now()
@@ -398,19 +411,26 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             driver.get(load_url_wide)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
-            while page_state=="complete":
+            if page_state=="complete":
                 print("url読み込み完了")
+                #xpathが完全に読み込まれるまで待機する
                 WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, xpath_wide)))
-                break
+                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")))
             else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_wide)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
+                while True:
+                    print("URLの読み込みに失敗したため再読み込みします。")
+                    driver.get(load_url_win)
+                    sleep(10)
+                    WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")))
+                    page_state=driver.execute_script("return document.readyState")
+                    if page_state=="complete":
+                        break
+                    else:
+                        continue
             
             #要素を変数に格納する
-            elements_wide = driver.find_elements(By.XPATH, xpath_wide)
+            elements_wide = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
 
             #現在の時刻を取得する
             now = datetime.now()
@@ -476,19 +496,26 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             driver.get(load_url_sanrenpuku)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
-            while page_state=="complete":
+            if page_state=="complete":
                 print("url読み込み完了")
+                #xpathが完全に読み込まれるまで待機する
                 WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, xpath_sanrenpuku)))
-                break
+                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
             else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_sanrenpuku)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
+                while True:
+                    print("URLの読み込みに失敗したため再読み込みします。")
+                    driver.get(load_url_win)
+                    sleep(10)
+                    WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
+                    page_state=driver.execute_script("return document.readyState")
+                    if page_state=="complete":
+                        break
+                    else:
+                        continue
             
             #要素を変数に格納する
-            elements_sanrenpuku_1 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+            elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
 
             #現在の時刻を取得する
             now = datetime.now()
@@ -506,11 +533,11 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sanrenpuku_ele_1=re.findall(sanrenpuku_match,sanrenpuku_ele_1)    
 
             #プルダウンを操作して101~200を取得する
-            select_elem = driver.find_element(By.XPATH, xpath_prudown)  # IDは変更の可能性あり
+            select_elem = driver.find_element(By.CLASS_NAME, xpath_prudown)  # IDは変更の可能性あり
             select = Select(select_elem)
             select.select_by_index(2)
             sleep(5)
-            elements_sanrenpuku_2 = driver.find_elements(By.XPATH, xpath_sanrenpuku)
+            elements_sanrenpuku_2 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
 
             #配列を整形する(101~200)
             for elem_5 in elements_sanrenpuku_2:
