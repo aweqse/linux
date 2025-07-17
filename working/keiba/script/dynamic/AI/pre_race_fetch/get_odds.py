@@ -2,12 +2,14 @@ from datetime import datetime
 from selenium import webdriver
 import pandas as pd
 from time import sleep
-from selenium.webdriver.common.by import By
 import re
 from selenium.webdriver.support.ui import Select
 import subprocess
 import get_day_and_config
 import get_racedata
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
@@ -103,45 +105,48 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
     #テスト用パラメーター
     hour_min_array=[
-                    580,    600,    605,    610,
-                    615,    635,	640,	645,
-                    645,	665,	670,	675,
-                    675,	695,	700,	705,
-                    725,	745,	750,	755,
-                    755,	775,	780,	785,
-                    785,	805,	810,	815,
-                    815,	835,	840,	845,
-                    845,	865,	870,	875,
-                    880,	900,	905,	910,
-                    915,	935,	940,	945,
-                    960,	980,	985,	990,
-                    571,	591,	596,    601,
-                    605,	625,	630,	635,
-                    635,	655,	660,	665,
-                    665,	685,	690,	695,
-                    715,	735,	740,	745,
-                    745,	765,	770,	775,
-                    775,	795,	800,	805,
-                    805,	825,	830,	835,
-                    835,	855,	860,	865,
-                    871,	891,	896,	901,
-                    905,	925,	930,	935,
-                    945,	965,	970,	975,
-                    560,	580,	585,	590,
-                    595,	615,	620,	625,
-                    625,	645,	650,	655,
-                    655,	675,	680,	685,
-                    705,	725,	730,	735,
-                    735,	755,	760,	765,
-                    765,	785,	790,	795,
-                    795,	815,	820,	825,
-                    825,	845,	850,	855,
-                    860,	880,	885,	890,
-                    895,	915,	920,	925,
-                    935,	955,	960,	965,
+                    580,600,605,
+                    615,635,640,
+                    645,665,670,
+                    675,695,700,
+                    725,745,750,
+                    755,775,780,
+                    785,805,810,
+                    815,835,840,
+                    845,865,870,
+                    880,900,905,
+                    915,935,940,
+                    960,980,985,
+                    571,591,596,
+                    605,625,630,
+                    635,655,660,
+                    665,685,690,
+                    715,735,740,
+                    745,765,770,
+                    775,795,800,
+                    805,825,830,
+                    835,855,860,
+                    871,891,896,
+                    905,925,930,
+                    945,965,970,
+                    560,580,585,
+                    595,615,620,
+                    625,645,650,
+                    655,675,680,
+                    705,725,730,
+                    735,755,760,
+                    765,785,790,
+                    795,815,820,
+                    825,845,850,
+                    860,880,885,
+                    895,915,920,
+                    935,955,960
+
 ]
     hour_min_array.sort()
     hour_min_array_count=0
+    #ここまでテスト用
+
     hour_min=hour_min_array[hour_min_array_count]
 
     #いつの時間の情報なのか判断するために配列の中身を乗り出して判定する
@@ -159,16 +164,26 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
     while len(before_30min_array)!=0 and len(before_10min_array)!=0 and len(before_5min_array)!=0:
         #本番は以下のコメントアウトを外す
         #hour_min=get_day_and_config.hour_min
+
+        #初期値
         check_odds_30=before_30min_array[0]
         check_odds_10=before_10min_array[0]
         check_odds_5=before_5min_array[0]
 
-        #テスト用
-        #hour_min=615
-
         while (check_odds_30<=hour_min) or (check_odds_10<=hour_min) or (check_odds_5<=hour_min):
-            #5分前を最優先で取得する
+            #テスト用
+            hour_min=hour_min_array[hour_min_array_count]
+            #ここまでテスト用
+            if len(before_30min_array)!=0:
+                check_odds_30=before_30min_array[0]
+            elif len(before_10min_array)!=0:
+                check_odds_10=before_10min_array[0]
+            elif len(before_5min_array)!=0:
+                check_odds_5=before_5min_array[0]
+
             before_30min_flg=before_10min_flg=before_5min_flg=0
+
+            #5分前を最優先で取得する
             if (check_odds_5<=hour_min):
                 before_5min_flg=1  
             elif (check_odds_10<=hour_min):
@@ -176,8 +191,14 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elif (check_odds_30<=hour_min):
                 before_30min_flg=1
 
+            #urlの読み込み
+            load_url_win=win_array[hour_min]
+            load_url_umaren=umaren_array[hour_min]
+            load_url_wide=wide_1array[hour_min]
+            load_url_sanrenpuku=sanrenpuku_array[hour_min]
+            
             #race_idを取り出す
-            str_race_id=race_id[race_id_count]
+            str_race_id=load_url_win[-12:]
 
             #パスを定義する
             xpath_win=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"
@@ -199,34 +220,35 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
 
             print("処理を開始します。")
-            #urlの読み込み
-            load_url_win=win_array[hour_min]
-            load_url_umaren=umaren_array[hour_min]
-            load_url_wide=wide_1array[hour_min]
-            load_url_sanrenpuku=sanrenpuku_array[hour_min]
 
             #単勝・複勝のオッズを取得する
             print("単勝・複勝の情報取得開始")
             driver.get(load_url_win)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
-            while page_state=="complete":
+            if page_state=="complete":
                 print("url読み込み完了")
-                break
+                #xpathが完全に読み込まれるまで待機する
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, xpath_win)))
             else:
-                print("URLの読み込みに失敗したため再読み込みします。")
-                driver.get(load_url_win)
-                sleep(10)
-                page_state=driver.execute_script("return document.readyState")
+                while True:
+                    print("URLの読み込みに失敗したため再読み込みします。")
+                    driver.get(load_url_win)
+                    sleep(10)
+                    WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, xpath_win)))
+                    page_state=driver.execute_script("return document.readyState")
+                    if page_state=="complete":
+                        break
+                    else:
+                        continue
             
             #要素を変数に格納する
             elements_win = driver.find_elements(By.XPATH, xpath_win)
             
             #単勝の取得時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            win_time=hour*60+minute
+            win_time=get_day_and_config.hour_min
             print("単勝・複勝の情報取得完了")
             
             #単勝,複勝の情報を加工する
@@ -293,6 +315,9 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sleep(5)
             while page_state=="complete":
                 print("url読み込み完了")
+                #xpathが完全に読み込まれるまで待機する
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, xpath_umaren)))
                 break
             else:
                 print("URLの読み込みに失敗したため再読み込みします。")
@@ -375,6 +400,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sleep(5)
             while page_state=="complete":
                 print("url読み込み完了")
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, xpath_wide)))
                 break
             else:
                 print("URLの読み込みに失敗したため再読み込みします。")
@@ -451,6 +478,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             sleep(5)
             while page_state=="complete":
                 print("url読み込み完了")
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, xpath_sanrenpuku)))
                 break
             else:
                 print("URLの読み込みに失敗したため再読み込みします。")
@@ -538,25 +567,31 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
             #時刻(分)を進めないと二重処理になるため1分待機する
             print("取得が完了したので待機します")
-            sleep(60)
-            hour_min=get_day_and_config.hour_min
+
+            #本番は以下のコメントアウトを外す
+            #sleep(60)
+
+            #本番は以下のコメントアウトを外す
+            #hour_min=get_day_and_config.hour_min
             race_id_count=race_id_count+1
 
             #取得した配列を削除する
-            if before_5min_flg==1:
+            if before_5min_flg==1 and len(before_5min_array)!=0:
                 del before_5min_array[0]
-            elif before_10min_flg==1:
+            elif before_10min_flg==1 and len(before_10min_array)!=0:
                 del before_10min_array[0]     
-            elif before_30min_flg==1:
+            elif before_30min_flg==1 and len(before_30min_array)!=0:
                 del before_30min_array[0]  
 
             #テスト用
             hour_min_array_count=hour_min_array_count+1
-            hour_min=hour_min_array[hour_min_array_count]
+            #ここまでテスト用
 
         print("該当時刻ではないので待機します")
         sleep(20)
-        hour_min=get_day_and_config.hour_min
+
+        #本番は以下のコメントアウトを外す
+        #hour_min=get_day_and_config.hour_min
         continue 
 
     print("競馬の終了時刻となったので待機を終了します")

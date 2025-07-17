@@ -4,12 +4,16 @@ from time import sleep
 import pandas as pd
 import re
 import get_day_and_config
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 def selenium():
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument('--disable-gpu')
-    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--ignore-certificate-errors') 
     options.add_argument('--allow-running-insecure-content')
     options.add_argument('--disable-web-security')
     options.add_argument('--blink-settings=imagesEnabled=false')
@@ -57,24 +61,47 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
     #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
     #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202502011009"
 
-    driver.get(load_url)
-
-    print("urlが読み込まれているかをチェックします。")
-    page_state=driver.execute_script("return document.readyState")
-    sleep(5)
-    while page_state=="complete":
-        print("url読み込み完了")
-        break
-    else:
-        print("URLの読み込みに失敗したため再読み込みします。")
-        driver.get(load_url)
-        sleep(20)
-        page_state=driver.execute_script("return document.readyState")
 
     #webページから情報を取得する
     xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
+    class_path_1="RaceList_Item02"
     xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
+    class_path_2="Icon_GradeType"
     xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
+    class_path_3="RaceTableArea"
+    print("urlが読み込まれているかをチェックします。")
+    
+    driver.get(load_url)
+    page_state=driver.execute_script("return document.readyState")
+    sleep(5)
+    if page_state=="complete":
+        print("url読み込み完了")
+        #xpathが完全に読み込まれるまで待機する
+        WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
+
+        #class_path_2はある場合とない場合があるので含めない
+
+        WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
+    else:
+        while True:
+            print("URLの読み込みに失敗したため再読み込みします。")
+            driver.get(load_url)
+            sleep(10)
+
+            WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
+
+            #class_path_2はある場合とない場合があるので含めない
+
+            WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))           
+            page_state=driver.execute_script("return document.readyState")
+            if page_state=="complete":
+                break
+            else:
+                continue           
     
     grade_dict={
         "Icon_GradeType Icon_GradeType1": "G1",
@@ -94,7 +121,7 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
     course_turf=course_dirt=course_jump=0
     right_handed=left_handed=other_handed=0
     course_type_A=course_type_B=course_type_C=course_type_D=course_type_out=course_type_in=course_type_two=0
-    weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0.
+    weather_sunny=weather_cloudy=weather_light_rain=weather_rain=weather_snow=weather_light_snow=weather_other=0
     baba_good=baba_light_good=baba_light_soft=baba_soft=0
     old_3age=old_2age=old_3age_over=old_4age_over=0
     only_hinba=0
@@ -103,17 +130,17 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
     place_sapporo=place_hakodate=place_fukushima=place_nigata=place_nakayama=place_tokyo=place_chukyo=place_kyoto=place_hanshin=place_kokura=0
 
     #headerを取得
-    elements_1 = driver.find_elements(By.XPATH, xpath_1)
+    elements_1 = driver.find_elements(By.CLASS_NAME, class_path_1)
     for elem_1 in elements_1:
         hearder=elem_1.text.split()        
 
     #G1,G2等をアイコンのクラスから判別するため取り出す
-    elements_2 = driver.find_elements(By.XPATH, xpath_2)
+    elements_2 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_2}')]") #完全一致ではなく部分一致の場合んお記述の方法
     for elem_2 in elements_2:
         class_str = elem_2.get_attribute("class")    
 
     #出走表を取得する
-    elements_3 = driver.find_elements(By.XPATH, xpath_3)
+    elements_3 = driver.find_elements(By.CLASS_NAME, class_path_3)
     for elem_3 in elements_3:
         maindata = elem_3.text.split("編集")
 
@@ -438,7 +465,7 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
 def export_csv(total_array,race_id):
     ymd=get_day_and_config.ymd
     print("csvに出力開始")
-    path_1="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+str(race_id)+ "_racedate.csv"
+    path_1="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata/"+str(race_id)+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")
