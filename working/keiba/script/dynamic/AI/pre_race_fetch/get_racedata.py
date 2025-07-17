@@ -28,7 +28,7 @@ def main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time):
     total_array,race_id=get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
     export_csv(total_array,race_id)
 
-def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time):
+def  get_and_prosees_data(driver,load_url,odds_win_array,min_odds_place_array,max_odds_place_array,odds_rank_array,win_time):
     year_now=get_day_and_config.year_now
     month_now=get_day_and_config.month_now
     day_now=get_day_and_config.day_now
@@ -402,6 +402,7 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
             re_match_2=re.match(match_12,str(check_2))
 
             #除外,取消がないい場合は通常の処理、ある場合はスキップする
+            
             if re_match:
                 wakuban=re_match.group(1)
                 umaban=re_match.group(2)
@@ -440,6 +441,12 @@ def  get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place
                 if horse_weight=="前計不":
                     horse_weight=-1
                 weight_change=re_match.group(11)
+                odds_count=0
+                while len(odds_win_array)>odds_count:
+                    odds_win=odds_win_array[odds_count]
+                    min_odds_place=min_odds_place_array[odds_count]
+                    max_odds_place=max_odds_place[odds_count]
+                    odds_rank=odds_rank[odds_count]
 
                 #変数を入れ配列を作成する
                 maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,

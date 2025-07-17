@@ -206,8 +206,13 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"     
             xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
             
+            elem_1_array=[]
+            elem_2_array=[]
+            elem_3_array=[]
+            elem_4_array=[]
+
             xpath_prudown=     "Axis_Horse_selectbox"
-            class_path_win_place="RaceOdds_HorseList_Table" #他候補　"Ninki"
+            class_path_win_place="RaceOdds_HorseList_Table"#他候補　"Ninki" RaceOdds_HorseList Tanfuku
             class_path_umaren= "Odds_Type_b4" #他候補"RaceOdds_HorseList_Table" "Ninki"
             class_path_wide="Odds_Type_b5" #他候補"RaceOdds_HorseList_Table" "Ninki" 
             class_path_sanrenpuku="Odds_Type_b7" #他候補　"RaceOdds_HorseList_Table" "Ninki" 
@@ -229,6 +234,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
             #単勝・複勝のオッズを取得する
             print("単勝・複勝の情報取得開始")
+            
+
+
+
             driver.get(load_url_win)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
@@ -251,7 +260,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                         continue
             
             #要素を変数に格納する
-            elements_win = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")
+            elements_win = driver.find_elements(By.CLASS_NAME, class_path_win_place)
             
             #単勝の取得時刻を取得する
             win_time=get_day_and_config.hour_min
@@ -261,13 +270,21 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("単勝の処理開始")
             for elem_1 in elements_win:
                 win_ele=elem_1.text.replace("\n","")
-
+                elem_1_array.append(win_ele)
+            win_ele="".join(elem_1_array)
+            
             #配列の加工
             split_match=r"(\d+)\s(\d+)\s(\d+)([^\d\s]+)\s(\d+\.\d)\s(\d+\.\d)\s*-\s*(\d+\.\d)"
             win_ele=re.findall(split_match,win_ele)
             win_count=0
 
             #変数の初期化
+            if before_10min_flg==1:
+                odds_win_array=[]
+                min_odds_place_array=[]
+                max_odds_place_array=[]
+                odds_rank_array=[]
+                win_time_array=[]
             win_export_array=[]
             cache_1_array=[]
             header_flg=0
@@ -281,7 +298,14 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                                 
                 win_match=r"(\d+)$"
                 match=re.search(win_match,load_url_win)
-                add_race_id=match.group(1) 
+                add_race_id=match.group(1)
+                if before_10min_flg==1:
+                    odds_win_array.append(odds_win)
+                    min_odds_place_array.append(min_odds_place)
+                    max_odds_place_array.append(max_odds_place)
+                    odds_rank_array.append(odds_rank)
+                    win_time_array.append()
+
                 
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
@@ -295,7 +319,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #racedate10分前の場合,racedataを作成する
             if before_10min_flg==1:
                 load_url=racedata_dict[hour_min]
-                get_racedata.main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
+                get_racedata.main(load_url,odds_win_array,min_odds_place_array,max_odds_place_array,odds_rank_array,win_time)
 
             #csvに出力する
             if before_30min_flg==1:
@@ -352,6 +376,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("馬連の処理開始")
             for elem_2 in elements_umaren:
                 umaren_ele=elem_2.text.replace("\n"," ")
+                elem_2_array.append(umaren_ele)
+            umaren_ele="".join(elem_2_array)
+
+            #配列の加工
             umaren_match=r"(\d+)\s(\d+)\s(\d+)\s(\d+\.\d)\s\d+\s[^\s]+\s\d+\s[^\s]+"
             umaren_ele=re.findall(umaren_match,umaren_ele)
 
@@ -443,6 +471,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("ワイドの処理開始")
             for elem_3 in elements_wide:
                 wide_ele=elem_3.text.replace("\n"," ")
+                elem_3_array.append(wide_ele)
+            win_ele="".join(elem_3_array)
+
+            #配列の加工
             wide_match = wide_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)\s+(\d+\.\d+)\s+\d+\s+[^\s]+\s+\d+\s+[^\s]+"
             wide_ele=re.findall(wide_match,wide_ele)
 
@@ -515,7 +547,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                         continue
             
             #要素を変数に格納する
-            elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
+            elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")
 
             #現在の時刻を取得する
             now = datetime.now()
@@ -529,22 +561,30 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #配列を整形する(1~100)
             for elem_4 in elements_sanrenpuku_1:
                 sanrenpuku_ele_1=elem_4.text.replace("\n"," ")
+                elem_4_array.append(sanrenpuku_ele_1)
+
+            #配列の加工
             sanrenpuku_match = sanrenpuku_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)"
             sanrenpuku_ele_1=re.findall(sanrenpuku_match,sanrenpuku_ele_1)    
 
             #プルダウンを操作して101~200を取得する
-            select_elem = driver.find_element(By.CLASS_NAME, xpath_prudown)  # IDは変更の可能性あり
+            select_elem = driver.find_element(By.XPATH, f'//select[contains(@class, {xpath_prudown})]')  # IDは変更の可能性あり
             select = Select(select_elem)
             select.select_by_index(2)
             sleep(5)
-            elements_sanrenpuku_2 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
+            elements_sanrenpuku_2 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")
 
             #配列を整形する(101~200)
             for elem_5 in elements_sanrenpuku_2:
                 sanrenpuku_ele_2=elem_5.text.replace("\n"," ")
+                elem_4_array.append(sanrenpuku_ele_2)
+            sanrenpuku_ele_2="".join(elem_4_array)
+
+            #配列を加工する
             sanrenpuku_match = sanrenpuku_match = r"(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+\.\d+)"
             sanrenpuku_ele_2=re.findall(sanrenpuku_match,sanrenpuku_ele_2)
 
+            #150まで取得する
             sanrenpuku_ele_2=sanrenpuku_ele_2[:50]         
 
             #同一の処理をするため配列を統合する
