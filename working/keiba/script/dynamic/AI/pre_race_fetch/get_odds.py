@@ -156,7 +156,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
     race_id=race_id.tolist()
     race_id_count=0
 
-    while len(before_30min_array!=0) and len(before_10min_array!=0) and len(before_5min_array!=0):
+    while len(before_30min_array)!=0 and len(before_10min_array)!=0 and len(before_5min_array)!=0:
         #本番は以下のコメントアウトを外す
         #hour_min=get_day_and_config.hour_min
         check_odds_30=before_30min_array[0]
@@ -193,10 +193,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             before_10min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
             before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
             before_10min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_wide_place_odds.csv"
-            before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_5min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_place_odds.csv"
+            before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
 
             print("処理を開始します。")
             #urlの読み込み

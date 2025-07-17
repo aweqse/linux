@@ -6,6 +6,7 @@ import re
 import csv
 import subprocess
 import get_day_and_config
+
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
 
@@ -65,7 +66,7 @@ def get_element():
         for check in temp:
             if any(word in check for word in sub_check_word) or (check in match_check_word):
                 starttime_array.append(check)
-                
+
     return starttime_array,match_check_word
 
 def process_date(starttime_array,match_check_word):

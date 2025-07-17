@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
 import re
-import subprocess
 import get_day_and_config
 
 def selenium():
