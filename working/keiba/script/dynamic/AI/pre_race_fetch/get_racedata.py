@@ -441,12 +441,11 @@ def  get_and_prosees_data(driver,load_url,odds_win_array,min_odds_place_array,ma
                 if horse_weight=="前計不":
                     horse_weight=-1
                 weight_change=re_match.group(11)
-                odds_count=0
-                while len(odds_win_array)>odds_count:
-                    odds_win=odds_win_array[odds_count]
-                    min_odds_place=min_odds_place_array[odds_count]
-                    max_odds_place=max_odds_place[odds_count]
-                    odds_rank=odds_rank[odds_count]
+ 
+                odds_win=odds_win_array[maindata_count]
+                min_odds_place=min_odds_place_array[maindata_count]
+                max_odds_place=max_odds_place_array[maindata_count]
+                odds_rank=odds_rank_array[maindata_count]
 
                 #変数を入れ配列を作成する
                 maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
