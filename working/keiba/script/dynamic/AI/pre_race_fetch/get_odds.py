@@ -284,7 +284,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 min_odds_place_array=[]
                 max_odds_place_array=[]
                 odds_rank_array=[]
-                win_time_array=[]
             win_export_array=[]
             cache_1_array=[]
             header_flg=0
@@ -304,8 +303,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                     min_odds_place_array.append(min_odds_place)
                     max_odds_place_array.append(max_odds_place)
                     odds_rank_array.append(odds_rank)
-                    win_time_array.append()
-
                 
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
