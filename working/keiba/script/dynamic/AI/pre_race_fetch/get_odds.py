@@ -10,6 +10,7 @@ import get_racedata
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import os
 
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
@@ -66,7 +67,6 @@ def read_csv():
     print("辞書の作成開始")
     umaren_array={}
     win_array={}
-    wide_array={}
     sanrenpuku_array={}
 
     #キーが同じ値だと上書きされるため時間とURLは別々で生成する
@@ -81,7 +81,7 @@ def read_csv():
     before_10min_umaren=dict(zip(before_10min, umaren_url_array))
     before_10min_wide=dict(zip(before_10min, wide_url_1array))
     before_10min_sanrenpuku=dict(zip(before_10min, sanrenpuku_url_1_array))
-    racedata_dict=dict(zip(before_10min, racedate_url_array))
+    racedata_dict=dict(zip(before_5min, racedate_url_array))
 
     #5分前
     before_5min_win=dict(zip(before_5min, win_url_araay))
@@ -103,51 +103,50 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
     #初期値
     hour_min=get_day_and_config.hour_min
 
-    #テスト用パラメーター
-    hour_min_array=[
-                    580,600,605,
-                    615,635,640,
-                    645,665,670,
-                    675,695,700,
-                    725,745,750,
-                    755,775,780,
-                    785,805,810,
-                    815,835,840,
-                    845,865,870,
-                    880,900,905,
-                    915,935,940,
-                    960,980,985,
-                    571,591,596,
-                    605,625,630,
-                    635,655,660,
-                    665,685,690,
-                    715,735,740,
-                    745,765,770,
-                    775,795,800,
-                    805,825,830,
-                    835,855,860,
-                    871,891,896,
-                    905,925,930,
-                    945,965,970,
-                    560,580,585,
-                    595,615,620,
-                    625,645,650,
-                    655,675,680,
-                    705,725,730,
-                    735,755,760,
-                    765,785,790,
-                    795,815,820,
-                    825,845,850,
-                    860,880,885,
-                    895,915,920,
-                    935,955,960
+#     #テスト用パラメーター
+#     hour_min_array=[
+#                     580,600,605,
+#                     615,635,640,
+#                     645,665,670,
+#                     675,695,700,
+#                     725,745,750,
+#                     755,775,780,
+#                     785,805,810,
+#                     815,835,840,
+#                     845,865,870,
+#                     880,900,905,
+#                     915,935,940,
+#                     960,980,985,
+#                     571,591,596,
+#                     605,625,630,
+#                     635,655,660,
+#                     665,685,690,
+#                     715,735,740,
+#                     745,765,770,
+#                     775,795,800,
+#                     805,825,830,
+#                     835,855,860,
+#                     871,891,896,
+#                     905,925,930,
+#                     945,965,970,
+#                     560,580,585,
+#                     595,615,620,
+#                     625,645,650,
+#                     655,675,680,
+#                     705,725,730,
+#                     735,755,760,
+#                     765,785,790,
+#                     795,815,820,
+#                     825,845,850,
+#                     860,880,885,
+#                     895,915,920,
+#                     935,955,960
 
-]
-    hour_min_array.sort()
-    hour_min_array_count=0
-    #ここまでテスト用
-
-    hour_min=hour_min_array[hour_min_array_count]
+# ]
+#     hour_min_array.sort()
+#     hour_min_array_count=0
+#     hour_min=hour_min_array[hour_min_array_count]
+#     #ここまでテスト用
 
     #いつの時間の情報なのか判断するために配列の中身を乗り出して判定する
     before_30min_array=before_30min.tolist()
@@ -159,28 +158,25 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
     before_10min_array.sort()
     before_5min_array.sort()
     race_id=race_id.tolist()
-    race_id_count=0
-
+    
     while len(before_30min_array)!=0 and len(before_10min_array)!=0 and len(before_5min_array)!=0:
         #本番は以下のコメントアウトを外す
-        #hour_min=get_day_and_config.hour_min
+        hour_min=get_day_and_config.hour_min
 
         #初期値
         check_odds_30=before_30min_array[0]
         check_odds_10=before_10min_array[0]
         check_odds_5=before_5min_array[0]
 
-        while (check_odds_30<=hour_min) or (check_odds_10<=hour_min) or (check_odds_5<=hour_min):
-            #テスト用
-            hour_min=hour_min_array[hour_min_array_count]
-            #ここまでテスト用
-            if len(before_30min_array)!=0:
-                check_odds_30=before_30min_array[0]
-            elif len(before_10min_array)!=0:
-                check_odds_10=before_10min_array[0]
-            elif len(before_5min_array)!=0:
-                check_odds_5=before_5min_array[0]
 
+        if len(before_30min_array)!=0:
+            check_odds_30=before_30min_array[0]
+        if len(before_10min_array)!=0:
+            check_odds_10=before_10min_array[0]
+        if len(before_5min_array)!=0:
+            check_odds_5=before_5min_array[0]
+
+        while (check_odds_30<=hour_min) or (check_odds_10<=hour_min) or (check_odds_5<=hour_min):
             before_30min_flg=before_10min_flg=before_5min_flg=0
 
             #5分前を最優先で取得する
@@ -200,11 +196,11 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #race_idを取り出す
             str_race_id=load_url_win[-12:]
 
-            #参考
-            xpath_win=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"    
-            xpath_umaren=      "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
-            xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"     
-            xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            # #参考
+            # xpath_win=         "/html/body/div[1]/div[3]/div[2]/div[1]/div[1]/div[1]/table"    
+            # xpath_umaren=      "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
+            # xpath_wide=        "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"     
+            # xpath_sanrenpuku=  "/html/body/div[1]/div[3]/div[2]/div[1]/div[3]/table/tbody"
             
             elem_1_array=[]
             elem_2_array=[]
@@ -230,7 +226,8 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
             before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
             marge_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+str(str_race_id)+ "_after_marge.csv"
-
+            racedata_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata/"+str(str_race_id)+ "_racedate.csv"
+            
             print("処理を開始します。")
 
             #単勝・複勝のオッズを取得する
@@ -276,6 +273,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             win_count=0
 
             #変数の初期化
+            marge_cach=[]
             win_export_array=[]
             cache_1_array=[]
             header_flg=0
@@ -286,39 +284,31 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 odds_win=check_1[4]
                 min_odds_place=check_1[5]
                 max_odds_place=check_1[6]
-                                
+                
+                #レースIDを取得する
                 win_match=r"(\d+)$"
                 match=re.search(win_match,load_url_win)
                 add_race_id=match.group(1)
-                
-                #5分前の場合、racedataとマージするためのcsvを生成する
-                if before_5min_flg==1:
-                    marge_asrray=[add_race_id,umaban,odds_win,min_odds_place,max_odds_place,odds_rank]
-                    #csvに出力する
-                    marge_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/marge/"+str(add_race_id)
-                    df_5=pd.DataFrame(marge_asrray)
-                    df_5.to_csv(marge_path, index=False, header=False, encoding='utf-8-sig') 
-                    print("マージ用のcsvを出力")
-                    sleep(2)
-                    #csvをマージする
-                    df_6=before_10min_win_path
-                    df_7=marge_path
-                    marge_df=pd.concat([df_6,df_7],axis=1)
-                    marge_df.to_csv(marge_csv, index=False, encoding="utf-8-sig")
-                
+                                
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
                 cache_1_array=[int(add_race_id),before_30min_flg,before_10min_flg,before_5min_flg,int(umaban),float(odds_win),float(min_odds_place),float(max_odds_place),int(odds_rank),win_time]
+                marge_array=[umaban,odds_win,min_odds_place,max_odds_place,odds_rank]
+                marge_cach.append(marge_array)
                 if header_flg==0:
                     win_export_array.append(header_1)
                     header_flg=1
                 win_export_array.append(cache_1_array)
                 win_count=win_count+1
-            
-            #racedate10分前の場合,racedataを作成する
+
+            #racedate5分前の場合,racedataを作成する
             if before_5min_flg==1:
-                load_url=racedata_dict[hour_min]
-                get_racedata.main(load_url)
+                if os.path.exists(racedata_csv):
+                    pass
+                else:
+                    load_url=racedata_dict[hour_min]
+                    print("レースの基礎情報を取得します・")
+                    get_racedata.main(load_url,marge_cach)
 
             #csvに出力する
             if before_30min_flg==1:
@@ -635,11 +625,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("取得が完了したので待機します")
 
             #本番は以下のコメントアウトを外す
-            #sleep(60)
-
-            #本番は以下のコメントアウトを外す
-            #hour_min=get_day_and_config.hour_min
-            race_id_count=race_id_count+1
+            sleep(60)
 
             #取得した配列を削除する
             if before_5min_flg==1 and len(before_5min_array)!=0:
@@ -649,15 +635,26 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elif before_30min_flg==1 and len(before_30min_array)!=0:
                 del before_30min_array[0]  
 
+            if len(before_30min_array)!=0:
+                check_odds_30=before_30min_array[0]
+            if len(before_10min_array)!=0:
+                check_odds_10=before_10min_array[0]
+            if len(before_5min_array)!=0:
+                check_odds_5=before_5min_array[0]
+            
             #テスト用
-            hour_min_array_count=hour_min_array_count+1
+            # hour_min_array_count=hour_min_array_count+1
+            # if len(before_30min_array)!=0 and len(before_10min_array)!=0 and len(before_5min_array)!=0:
+            #     pass
+            # else:
+            #     hour_min=hour_min_array[hour_min_array_count]
             #ここまでテスト用
 
         print("該当時刻ではないので待機します")
         sleep(20)
 
         #本番は以下のコメントアウトを外す
-        #hour_min=get_day_and_config.hour_min
+        hour_min=get_day_and_config.hour_min
         continue 
 
     print("競馬の終了時刻となったので待機を終了します")

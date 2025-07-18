@@ -23,12 +23,12 @@ def selenium():
     driver = webdriver.Chrome(options=options)
     return driver
 
-def main(load_url):
+def main(load_url,marge_cach):
     driver=selenium()
-    total_array,race_id=get_and_prosees_data(driver,load_url)
+    total_array,race_id=get_and_prosees_data(driver,load_url,marge_cach)
     export_csv(total_array,race_id)
 
-def  get_and_prosees_data(driver,load_url):
+def  get_and_prosees_data(driver,load_url,marge_cach):
     year_now=get_day_and_config.year_now
     month_now=get_day_and_config.month_now
     day_now=get_day_and_config.day_now
@@ -61,10 +61,10 @@ def  get_and_prosees_data(driver,load_url):
     #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
     #load_url="https://race.netkeiba.com/race/shutuba.html?race_id=202502011009"
 
-    #参考記述
-    xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
-    xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
-    xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
+    # #参考記述
+    # xpath_1="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]"
+    # xpath_2="/html/body/div[1]/div[2]/div/div[1]/div[3]/div[2]/h1/span[1]"
+    # xpath_3="/html/body/div[1]/div[3]/div[2]/table/tbody"
 
     #webページから情報を取得する
     class_path_1="RaceList_Item02"
@@ -383,7 +383,7 @@ def  get_and_prosees_data(driver,load_url):
     print("出走馬の情報を取得開始")
     total_array.append(data_colme)
     match_11=r"\s*(\d+)\s+(\d+)\s+([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)\s+([^\s]+)\s+(栗東|美浦|海外)([^\s]+)\s+(\d+)\(([-+]?\d+|前計不)\)"
-    match_12=r"\s*(\d+)\s+(\d+)\s+(除外|取消)?\s*([^\s]+)\s+([牝牡セ])(\d+)\s+(\d+\.\d)?\s*([^\s]+)?\s*(栗東|美浦|海外)?([^\s]+)?"
+    match_12=r"\s*(\d+)\s+(\d+)\s+(取消|除外)"
     
     while len(maindata)>maindata_count:
         #変数の初期化
@@ -398,29 +398,35 @@ def  get_and_prosees_data(driver,load_url):
         else:
             #余計な文字を空白に置き換えてまとめて削除して要素に分割する
             check_2 = check_2.replace("--", " ").replace("\n", " ")
-            re_match=re.search(match_11,str(check_2))
+            re_match_1=re.search(match_11,str(check_2))
             re_match_2=re.search(match_12,str(check_2))
 
             #関係ない文の場合はスキップする
-            if re_match or re_match_2:
+            odds_search_count=0
+            if re_match_2:
+                print("正規表現にマッチしませんでした")
+                maindata_count=maindata_count+1
+                continue
+
+            elif re_match_1:
                 print("1つめの正規表現にマッチしました")
-                wakuban=re_match.group(1)
-                umaban=re_match.group(2)
-                horse_name=re_match.group(3)
+                wakuban=re_match_1.group(1)
+                umaban=re_match_1.group(2)
+                horse_name=re_match_1.group(3)
 
                 #horse_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
                 horse_id=-10
                 
-                sex=re_match.group(4)
+                sex=re_match_1.group(4)
                 if sex=="牡":
                     sex_male=1
                 elif sex=="牝":
                     sex_female=1
                 elif sex=="セ":
                     sex_gelding=1
-                horse_age=re_match.group(5)
-                assigned_weight=re_match.group(6)
-                jockey=re_match.group(7)
+                horse_age=re_match_1.group(5)
+                assigned_weight=re_match_1.group(6)
+                jockey=re_match_1.group(7)
                 if ("▲" in jockey):
                      jockey=jockey.replace("▲","")
                 elif("◇"in jockey):
@@ -435,37 +441,48 @@ def  get_and_prosees_data(driver,load_url):
                 #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
                 kopckey_id=-10
 
-                belong_trainer=re_match.group(8)
+                belong_trainer=re_match_1.group(8)
                 if belong_trainer=="美浦":
                     belong_east=1
                 elif belong_trainer=="栗東":
                     belong_west=1
                 elif belong_trainer=="海外":
                     belong_oversea=1
-                trainer=re_match.group(9)
+                trainer=re_match_1.group(9)
 
                 #trainer_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
                 trainer_id=-10
         
-                horse_weight=re_match.group(10)
+                horse_weight=re_match_1.group(10)
                 if horse_weight=="前計不":
                     horse_weight=-1
-                weight_change=re_match.group(11)
+                weight_change=re_match_1.group(11)
                 
+                #馬番からオッズを格納する
+                odds_search_count=0
+                while len(marge_cach)>odds_search_count:
+                    check_3=marge_cach[odds_search_count][0]
+                    if check_3==umaban:
+                        odds_win=marge_cach[odds_search_count][1]
+                        min_odds_place=marge_cach[odds_search_count][2]
+                        max_odds_place=marge_cach[odds_search_count][3]
+                        odds_rank=marge_cach[odds_search_count][4]
+                        break
+                    odds_search_count=odds_search_count+1
+
                 #変数を入れ配列を作成する
                 maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
                                 int(horse_age),float(assigned_weight),jockey,kopckey_id,belong_east,belong_west,belong_oversea,
-                                trainer,trainer_id,int(horse_weight),int(weight_change),
+                                trainer,trainer_id,int(horse_weight),int(weight_change),float(odds_win),float(min_odds_place),float(max_odds_place),int(odds_rank)
                                 ]
                 add_array=header_data+maindate_array
                 total_array.append(add_array)
                 maindata_count=maindata_count+1
+                
                 continue
-            
-            else:
-                print("正規表現にマッチしませんでした")
-                maindata_count=maindata_count+1
-                continue
+            #正規表現がどちらにもマッチしなかった場合何もせずに処理を進める
+            maindata_count=maindata_count+1
+
             
 
     print("要素の分離と配列の格納完了")
