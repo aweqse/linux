@@ -221,23 +221,20 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             before_30min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
             before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
             before_30min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_10min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_place_odds.csv"
+            before_10min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_win_place_odds.csv"
             before_10min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
             before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
             before_10min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_place_odds.csv"
+            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_win_place_odds.csv"
             before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_umaren_odds.csv"
             before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
             before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            marge_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+str(str_race_id)+ "_after_marge.csv"
 
             print("処理を開始します。")
 
             #単勝・複勝のオッズを取得する
             print("単勝・複勝の情報取得開始")
-            
-
-
-
             driver.get(load_url_win)
             page_state=driver.execute_script("return document.readyState")
             sleep(5)
@@ -279,11 +276,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             win_count=0
 
             #変数の初期化
-            if before_10min_flg==1:
-                odds_win_array=[]
-                min_odds_place_array=[]
-                max_odds_place_array=[]
-                odds_rank_array=[]
             win_export_array=[]
             cache_1_array=[]
             header_flg=0
@@ -298,11 +290,21 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 win_match=r"(\d+)$"
                 match=re.search(win_match,load_url_win)
                 add_race_id=match.group(1)
-                if before_10min_flg==1:
-                    odds_win_array.append(odds_win)
-                    min_odds_place_array.append(min_odds_place)
-                    max_odds_place_array.append(max_odds_place)
-                    odds_rank_array.append(odds_rank)
+                
+                #5分前の場合、racedataとマージするためのcsvを生成する
+                if before_5min_flg==1:
+                    marge_asrray=[add_race_id,umaban,odds_win,min_odds_place,max_odds_place,odds_rank]
+                    #csvに出力する
+                    marge_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/marge/"+str(add_race_id)
+                    df_5=pd.DataFrame(marge_asrray)
+                    df_5.to_csv(marge_path, index=False, header=False, encoding='utf-8-sig') 
+                    print("マージ用のcsvを出力")
+                    sleep(2)
+                    #csvをマージする
+                    df_6=before_10min_win_path
+                    df_7=marge_path
+                    marge_df=pd.concat([df_6,df_7],axis=1)
+                    marge_df.to_csv(marge_csv, index=False, encoding="utf-8-sig")
                 
                 #配列に格納する
                 header_1=["レースID","30分前","10分前","5分前","馬番","単勝オッズ","最小複勝オッズ","最大複勝オッズ","人気","取得時間"]
@@ -314,9 +316,9 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 win_count=win_count+1
             
             #racedate10分前の場合,racedataを作成する
-            if before_10min_flg==1:
+            if before_5min_flg==1:
                 load_url=racedata_dict[hour_min]
-                get_racedata.main(load_url,odds_win_array,min_odds_place_array,max_odds_place_array,odds_rank_array,win_time)
+                get_racedata.main(load_url)
 
             #csvに出力する
             if before_30min_flg==1:
