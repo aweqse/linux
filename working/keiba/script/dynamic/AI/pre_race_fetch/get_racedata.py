@@ -23,12 +23,12 @@ def selenium():
     driver = webdriver.Chrome(options=options)
     return driver
 
-def main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time):
+def main(load_url):
     driver=selenium()
-    total_array,race_id=get_and_prosees_data(driver,load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
+    total_array,race_id=get_and_prosees_data(driver,load_url)
     export_csv(total_array,race_id)
 
-def  get_and_prosees_data(driver,load_url,odds_win_array,min_odds_place_array,max_odds_place_array,odds_rank_array,win_time):
+def  get_and_prosees_data(driver,load_url):
     year_now=get_day_and_config.year_now
     month_now=get_day_and_config.month_now
     day_now=get_day_and_config.day_now
@@ -398,12 +398,12 @@ def  get_and_prosees_data(driver,load_url,odds_win_array,min_odds_place_array,ma
         else:
             #余計な文字を空白に置き換えてまとめて削除して要素に分割する
             check_2 = check_2.replace("--", " ").replace("\n", " ")
-            re_match=re.match(match_11,str(check_2))
-            re_match_2=re.match(match_12,str(check_2))
+            re_match=re.search(match_11,str(check_2))
+            re_match_2=re.search(match_12,str(check_2))
 
-            #除外,取消がないい場合は通常の処理、ある場合はスキップする
-            
-            if re_match:
+            #関係ない文の場合はスキップする
+            if re_match or re_match_2:
+                print("1つめの正規表現にマッチしました")
                 wakuban=re_match.group(1)
                 umaban=re_match.group(2)
                 horse_name=re_match.group(3)
@@ -421,6 +421,16 @@ def  get_and_prosees_data(driver,load_url,odds_win_array,min_odds_place_array,ma
                 horse_age=re_match.group(5)
                 assigned_weight=re_match.group(6)
                 jockey=re_match.group(7)
+                if ("▲" in jockey):
+                     jockey=jockey.replace("▲","")
+                elif("◇"in jockey):
+                    jockey=jockey.replace("◇","")
+                elif("★"in jockey):
+                    jockey=jockey.replace("★","")
+                elif("☆" in jockey):
+                    jockey=jockey.replace("☆","")
+                elif("△" in jockey):
+                    jockey=jockey.replace("△","")
 
                 #jockey_idのテーブルができたらそこから取り出す処理を書くので仮の値で-10
                 kopckey_id=-10
@@ -441,27 +451,22 @@ def  get_and_prosees_data(driver,load_url,odds_win_array,min_odds_place_array,ma
                 if horse_weight=="前計不":
                     horse_weight=-1
                 weight_change=re_match.group(11)
- 
-                odds_win=odds_win_array[maindata_count]
-                min_odds_place=min_odds_place_array[maindata_count]
-                max_odds_place=max_odds_place_array[maindata_count]
-                odds_rank=odds_rank_array[maindata_count]
-
+                
                 #変数を入れ配列を作成する
                 maindate_array=[ int(wakuban),int(umaban),horse_name,horse_id,sex_male,sex_female,sex_gelding,
                                 int(horse_age),float(assigned_weight),jockey,kopckey_id,belong_east,belong_west,belong_oversea,
                                 trainer,trainer_id,int(horse_weight),int(weight_change),
-                                odds_win,min_odds_place,max_odds_place,odds_rank,win_time
                                 ]
                 add_array=header_data+maindate_array
                 total_array.append(add_array)
                 maindata_count=maindata_count+1
                 continue
             
-            elif re_match_2:
+            else:
+                print("正規表現にマッチしませんでした")
                 maindata_count=maindata_count+1
                 continue
-
+            
 
     print("要素の分離と配列の格納完了")
     #chromeを閉じる
