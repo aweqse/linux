@@ -69,6 +69,7 @@ if md in check_array:
     mkdir_path_3=get_day_and_config.mkdir_path_3
     mkdir_path_4=get_day_and_config.mkdir_path_4
     mkdir_path_5=get_day_and_config.mkdir_path_5
+    mkdir_path_6=get_day_and_config.mkdir_path_6
     py_path_1=get_day_and_config.py_path_1
     py_path_2=get_day_and_config.py_path_2
 
@@ -78,6 +79,7 @@ if md in check_array:
     subprocess.run(["mkdir",mkdir_path_3])
     subprocess.run(["mkdir",mkdir_path_4])
     subprocess.run(["mkdir",mkdir_path_5])
+    subprocess.run(["mkdir",mkdir_path_6])
     
     #プログラムを起動する
     subprocess.run(["python3",py_path_1])
