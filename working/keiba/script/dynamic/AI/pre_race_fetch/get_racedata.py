@@ -136,7 +136,7 @@ def  get_and_prosees_data(driver,load_url,marge_cach):
         hearder=elem_1.text.split()        
 
     #G1,G2等をアイコンのクラスから判別するため取り出す
-    elements_2 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_2}')]") #完全一致ではなく部分一致の場合んお記述の方法
+    elements_2 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_2}')]") #完全一致ではなく部分一致の場合の記述の方法
     for elem_2 in elements_2:
         class_str = elem_2.get_attribute("class")    
 
