@@ -7,6 +7,7 @@ import sys
 import subprocess
 import get_day_and_config
 
+sleep(10)
 #リソース確保のため chromeを終了する
 subprocess.run(["pkill","chrome"])
 
@@ -24,7 +25,7 @@ driver = webdriver.Chrome(options=options)
 
 #今日がレースの日なのかを判定するための情報を取得する
 load_url="https://race.netkeiba.com/top/"
-xpath_day="/html/body/div[1]/div/div[1]/div[5]/div[2]/div/div[1]/ul"
+xpath_day="Tab4"
 driver.get(load_url)
 page_state=driver.execute_script("return document.readyState")
 sleep(5)
@@ -38,7 +39,7 @@ else:
     page_state=driver.execute_script("return document.readyState")
 
 #要素を変数に格納する
-elements_day = driver.find_elements(By.XPATH, xpath_day)
+elements_day =driver.find_elements(By.XPATH,f"//*[contains(@class, '{xpath_day}')]") 
 for elem_3 in elements_day:
     day_elem=elem_3.text.split()
 day_match=r"(\d+)月(\d+)日"
