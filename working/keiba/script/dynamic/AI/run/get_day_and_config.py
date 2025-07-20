@@ -32,11 +32,11 @@ md=month_now+day_now
     #テスト用
     #md="0713"
 
-mkdir_path_1="/home/aweqse/dev/working/keiba/output/"+ymd
-mkdir_path_2="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min"
-mkdir_path_3="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min"
-mkdir_path_4="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min"
-mkdir_path_5="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata"
-py_path_1="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_racetime.py"
-py_path_2="/home/aweqse/dev/working/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
+mkdir_path_1="/home/aweqse/keiba/output/"+ymd
+mkdir_path_2="/home/aweqse/keiba/output/"+ymd+"/before_30min"
+mkdir_path_3="/home/aweqse/keiba/output/"+ymd+"/before_10min"
+mkdir_path_4="/home/aweqse/keiba/output/"+ymd+"/before_05min"
+mkdir_path_5="/home/aweqse/keiba/output/"+ymd+"/racedata"
+py_path_1=   "/home/aweqse/keiba/script/dynamic/AI/pre_race_fetch/get_racetime.py"
+py_path_2=   "/home/aweqse/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
 

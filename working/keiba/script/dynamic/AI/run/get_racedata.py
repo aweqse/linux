@@ -7,7 +7,6 @@ import get_day_and_config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 
 def selenium():
     options = webdriver.ChromeOptions()
@@ -494,7 +493,7 @@ def  get_and_prosees_data(driver,load_url,marge_cach):
 def export_csv(total_array,race_id):
     ymd=get_day_and_config.ymd
     print("csvに出力開始")
-    path_1="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata/"+str(race_id)+ "_racedate.csv"
+    path_1="/home/aweqse/keiba/output/"+ymd+"/racedata/"+str(race_id)+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")

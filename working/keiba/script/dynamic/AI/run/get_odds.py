@@ -36,10 +36,10 @@ def read_csv():
     print("urlの格納開始")
     ymd=get_day_and_config.ymd
     #csvファイルを読み取りレースIDを抽出しURLを生成する
-    path_1="/home/aweqse/dev/working/keiba/output/"+str(ymd)+"/"+str(ymd)+"_racetime.csv"
+    path_1="/home/aweqse/keiba/output/"+str(ymd)+"/"+str(ymd)+"_racetime.csv"
     
     #テスト用
-    #path_1="/home/aweqse/dev/working/keiba/output/20250715/20250715_racetime.csv" 
+    #path_1="/home/aweqse/keiba/output/20250715/20250715_racetime.csv" 
 
     df = pd.read_csv(path_1,index_col=False)
     #csvファイルから情報を読み取る
@@ -210,26 +210,25 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elem_3_array=[]
             elem_4_array=[]
 
-            xpath_prudown=     "Axis_Horse_selectbox"
-            class_path_win_place="RaceOdds_HorseList_Table"#他候補　"Ninki" RaceOdds_HorseList Tanfuku
-            class_path_umaren= "Odds_Type_b4" #他候補"RaceOdds_HorseList_Table" "Ninki"
-            class_path_wide="Odds_Type_b5" #他候補"RaceOdds_HorseList_Table" "Ninki" 
+            xpath_prudown=        "Axis_Horse_selectbox"
+            class_path_win_place= "RaceOdds_HorseList_Table"#他候補　"Ninki" RaceOdds_HorseList Tanfuku
+            class_path_umaren=    "Odds_Type_b4" #他候補"RaceOdds_HorseList_Table" "Ninki"
+            class_path_wide=      "Odds_Type_b5" #他候補"RaceOdds_HorseList_Table" "Ninki" 
             class_path_sanrenpuku="Odds_Type_b7" #他候補　"RaceOdds_HorseList_Table" "Ninki" 
                     
-            before_30min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_win_place_odds.csv"
-            before_30min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_30min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_10min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_win_place_odds.csv"
-            before_10min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_10min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_win_place_odds.csv"
-            before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            marge_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+str(str_race_id)+ "_after_marge.csv"
-            racedata_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata/"+str(str_race_id)+ "_racedate.csv"
+            before_30min_win_path=       "/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_30min_umaren_path=    "/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_30min_wide_path=      "/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_30min_sanrenpuku_path="/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_10min_win_path=       "/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_10min_umaren_path=    "/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_10min_wide_path=      "/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_10min_sanrenpuku_path="/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_5min_win_path=        "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_5min_umaren_path=     "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_5min_wide_path=       "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_5min_sanrenpuku_path= "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            racedata_csv=                "/home/aweqse/keiba/output/"+ymd+"/racedata/"+str(str_race_id)+ "_racedate.csv"
             
             print("処理を開始します。")
 

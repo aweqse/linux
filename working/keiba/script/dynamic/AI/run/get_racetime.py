@@ -35,7 +35,7 @@ def get_element():
     load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date="+ymd
     
     #テスト用のURL
-    load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date=20250713"
+    #load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date=20250713"
 
     driver.get(load_url)
     #ページが読み込まれているかチェックする
@@ -140,7 +140,7 @@ def process_date(starttime_array,match_check_word):
 def export_csv(alltime_array):
     ymd=get_day_and_config.ymd
     #path="/home/aweqse/"+ymd+"_racetime.csv"
-    path="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+ymd+"_racetime.csv"
+    path="/home/aweqse/keiba/output/"+ymd+"/"+ymd+"_racetime.csv"
     #path="C:\\workspace\\プログラム\\競馬\\AI\\"+ymd+"_racetime.csv"
     with open(path, "w", newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
