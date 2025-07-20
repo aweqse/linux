@@ -158,10 +158,13 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
     before_10min_array.sort()
     before_5min_array.sort()
     race_id=race_id.tolist()
+
+    # #テスト用パラメーター
+    # hour_min=559
     
     while len(before_30min_array)!=0 and len(before_10min_array)!=0 and len(before_5min_array)!=0:
         #本番は以下のコメントアウトを外す
-        hour_min=get_day_and_config.hour_min
+        # hour_min=get_day_and_config.hour_min
 
         #初期値
         check_odds_30=before_30min_array[0]
@@ -650,11 +653,17 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             #     hour_min=hour_min_array[hour_min_array_count]
             #ここまでテスト用
 
-        print("該当時刻ではないので待機します")
+            # #テスト用パラメーター
+            # hour_min=hour_min+1
+
+        print("該当時刻ではないので待機します。現在の時刻は"+str(hour_min)+"です。" )
         sleep(20)
 
         #本番は以下のコメントアウトを外す
         hour_min=get_day_and_config.hour_min
+        
+        # #テスト用パラメーター
+        # hour_min=hour_min+1
         continue 
 
     print("競馬の終了時刻となったので待機を終了します")
