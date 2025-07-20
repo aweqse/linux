@@ -3,31 +3,31 @@ sudo apt-get -y update
 sudo apt-get -y upgrade
 sudo apt-get -y autoremove
 
-#vscode
-sudo apt install /home/aweqse/keiba/deb/code_1.96.0-1733888194_amd64.deb
-
 #SSH
 sudo apt install openssh-server -y
 
-#mysql
-sudo apt install mysql-server-8.0 -f -y
-
-#mysql-workbench
-sudo snap install mysql-workbench-community 
-
 #google-crome
-sudo apt install /home/aweqse/keiba/deb/google-chrome-stable_current_amd64.deb
+# 1. 必要なツールをインストール
+sudo apt update
+sudo apt install -y wget gnupg
+
+# 2. Googleの署名鍵を取得して登録
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-linux-signing-key.gpg
+
+# 3. Chromeのリポジトリを追加
+echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+
+# 4. パッケージリストを更新
+sudo apt update
+
+# 5. Google Chromeをインストール（Stable版）
+sudo apt install -y google-chrome-stable
 
 #python-library
 sudo apt install pip -y
 sudo pip install selenium --break-system-packages
 sudo pip install mysql-connector-python --break-system-packages
-sudo pip install openpyxl --break-system-packages
 sudo pip install pandas --break-system-packages
-sudo pip install madplotlib --break-system-packages
-
-#office
-sudo apt install libreoffice -y
 
 #crontab
 crontab /home/aweqse/keiba/crontab/keiba_crontab
