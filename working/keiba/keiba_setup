@@ -32,6 +32,13 @@ sudo pip install pandas --break-system-packages
 #crontab
 crontab /home/aweqse/keiba/crontab/keiba_crontab
 
+
+#文字化け対策文字化け対策
+sudo apt update
+sudo apt install language-pack-ja
+sudo update-locale LANG=ja_JP.UTF-8
+
+
 sudo apt-get -y update
 sudo apt-get -y upgrade
 sudo apt-get -y autoremove 
