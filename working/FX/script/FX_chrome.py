@@ -19,6 +19,12 @@ options.add_argument('--blink-settings=imagesEnabled=false')
 options.add_argument('--ignore-certificate-errors')
 driver = webdriver.Chrome(options=options)
 
+
+WebDriverWait(driver, 15).until(
+    EC.presence_of_element_located((By.XPATH, "/html/body/section/div[2]/div/div/form/div[1]/p[2]/input"))
+)
+
+
 #各種パス
 yahoo_path="https://finance.yahoo.co.jp/quote/USDJPY=FX"
 SBI_path="https://www.sbifxt.co.jp/"
@@ -29,9 +35,13 @@ SBI_element="/html/body/section/div[2]/div/div/form/div[1]/p[2]/input"
 #URLにアクセスしする
 driver.get(yahoo_path)
 print(driver.current_url)
-driver.maximize_window() #全画面表示でないと証拠金維持率が取得できないので注意
-WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+driver.maximize_window() #全画面表示でないと証拠金維持率が取得できないので注意 解像度もフルHDにする
 print(driver.current_url)
+
+#要素が表示されるまで待機する
+WebDriverWait(driver, 15).until(
+    EC.presence_of_element_located((By.XPATH, now_value_path))
+)
 
 #now_valueを取得する
 now_value = driver.find_element(By.XPATH, now_value_path)
@@ -96,35 +106,33 @@ while now_value >= 1:  # continueのためのダミー
         if relod_count==3600:
             driver.quit()
             relod_count=1
-            sleep(3)
             driver = webdriver.Chrome(options=options)
             driver.get(yahoo_path)
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
             print(driver.current_url)
             driver.maximize_window()
-            sleep(3)
             continue
         
         #8分たったらリロードする（2秒*240=480=5分）
         elif relod_count%240 == 0:
             driver.get(yahoo_path)
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
             print(driver.current_url)
             print("リロード判定のために要素を検索しています")
-            sleep(3)
+            #要素が表示されるまで待機する
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, now_value_path))
+            )
             judgement=len(driver.find_elements(By.XPATH, now_value_path))
-            #読み込み待ちの処理
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
             print(driver.current_url)
 
             print("要素の検索終了")
             #リロード判定をする
             while judgement==0:
                 print("現在の価格が取得できないためリロードを行います")
-                sleep(2)
                 driver.get(yahoo_path)
-                sleep(2)
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+                #要素が表示されるまで待機する
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, now_value_path))
+                )
                 print(driver.current_url)  
                 judgement=len(driver.find_elements(By.XPATH, now_value_path))
 
@@ -139,15 +147,16 @@ while now_value >= 1:  # continueのためのダミー
             continue
 
         elif relod_count < 3600:
+            #要素が表示されるまで待機する
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, now_value_path))
+            )
             now_value = driver.find_element(By.XPATH,now_value_path)
-            #読み込み待ちの処理
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
             #now_value, buy_valueを確定させる
             now_value = now_value.text.replace("\n", "")
             now_value = float(now_value)
             print(now_value)
             #下記のsleepは現在価格を取得する間隔なので削除しないこと
-            sleep(2)
             relod_count = relod_count+1
 
             # 10回同じ値の場合リロードする
@@ -177,9 +186,10 @@ while now_value >= 1:  # continueのためのダミー
         if now_value <= l_buy_value:  # 買い注文(ロング)
             driver.get(SBI_path)
             print(driver.current_url)
-
-            #読み込み待ちの処理
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+            #要素が表示されるまで待機する
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, SBI_element))
+            )
             print(driver.current_url)
 
             print("リロード判定のために要素を検索しています")
@@ -187,12 +197,11 @@ while now_value >= 1:  # continueのためのダミー
             print("要素の検索終了")
             while judgement_2==0:
                 print("現在の価格が取得できないためリロードを行います")
-                sleep(2)
                 driver.get(SBI_path)
-                sleep(2)
-                #読み込み待ちの処理
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-                print(driver.current_url)
+                #要素が表示されるまで待機する
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, SBI_element))
+                )
                 judgement_2=len(driver.find_elements(By.XPATH, SBI_element))
             print("アクセス完了")
             print("購入処理を開始します")
@@ -204,20 +213,25 @@ while now_value >= 1:  # continueのためのダミー
             input_element_user.send_keys("7644016862")
             input_element_pass = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/section/div[2]/div/div/form/div[1]/p[3]/input")))
             input_element_pass.send_keys("guxvudfarqy8TarhGj")
+            #要素が表示されるまで待機する
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/section/div[2]/div/div/form/div[3]/p/a"))
+            )
             driver.find_element(By.XPATH, "/html/body/section/div[2]/div/div/form/div[3]/p/a").click()
-            sleep(10)
 
             #画面遷移する(URLが切り替わる)
             #購入するドル数を計算する
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-            print(driver.current_url)
+            #要素が表示されるまで待機する
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/div/div/div[1]/section/div/section/div[1]/div[1]/div/dl/dd/span[1]"))
+            )
             doller_value=driver.find_elements(By.XPATH,"/html/body/div[3]/div/div/div[1]/section/div/section/div[1]/div[1]/div/dl/dd/span[1]")
             while len(doller_value)==0:
                 print("購入するドル数が取得できなかったのでリロードを行います")
-                sleep(5)
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/div/div/div[1]/section/div/section/div[1]/div[1]/div/dl/dd/span[1]"))
+                )
                 doller_value=driver.find_elements(By.XPATH,"/html/body/div[3]/div/div/div[1]/section/div/section/div[1]/div[1]/div/dl/dd/span[1]")
-                sleep(15)
             doller_value=doller_value[0].text
             doller_value=doller_value.replace(",","")
             doller_value=int(doller_value)
@@ -226,38 +240,39 @@ while now_value >= 1:  # continueのためのダミー
 
             #テスト用パラメーター
             #buy_doller=1
-
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/div/div/div[1]/section/section[1]/div/div/ul/li[1]/p/button[1]/span"))
+            )
             driver.find_element(
                 By.XPATH, "/html/body/div[3]/div/div/div[1]/section/section[1]/div/div/ul/li[1]/p/button[1]/span").click()
-            sleep(10)
+
             print("ログインに成功しました。購入処理をはじめます")
 
             #証拠金維持率を取得する
-            WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-            print(driver.current_url)
-            marge=driver.find_elements(
-                By.XPATH,"/html/body/div[3]/nav/div/div/div/section[1]/ul/li[3]/span")
+            WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/section[1]/ul/li[3]/span"))
+            )
+            marge=driver.find_elements(By.XPATH,"/html/body/div[3]/nav/div/div/div/section[1]/ul/li[3]/span")
             
             #証拠金維持率が取得できなかったための処理
             while len(marge)==0:
                 print("証拠金維持率を取得できなかったので再度取得します")
-                sleep(5)
                 driver.get("https://trade.sbifxt.co.jp/aweb/home.jsp")
-                sleep(15)
-                marge=driver.find_elements(
-                By.XPATH,"/html/body/div[3]/nav/div/div/div/section[1]/ul/li[4]/span")                    
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/section[1]/ul/li[4]/span"))
+                )
+                marge=driver.find_elements(By.XPATH,"/html/body/div[3]/nav/div/div/div/section[1]/ul/li[4]/span")                    
             marge=marge[0].text         
             marge_par=marge.replace("%","").replace(",","")
             
             #買い玉がない場合の処理
             while marge_par=="-":
                 print("証拠金維持率が取得できないのでリロードします。")
-                sleep(5)
                 driver.get("https://trade.sbifxt.co.jp/aweb/home.jsp")
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-                marge=driver.find_element(
-                By.XPATH,"/html/body/div[3]/nav/div/div/div/section[1]/ul/li[4]/span") 
-                sleep(15)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/section[1]/ul/li[4]/span"))
+                )
+                marge=driver.find_element(By.XPATH,"/html/body/div[3]/nav/div/div/div/section[1]/ul/li[4]/span") 
                 marge=marge.text         
                 marge_par=marge.replace("%","").replace(",","")
             print("証拠金維持率は"+marge_par+"です")
@@ -273,7 +288,9 @@ while now_value >= 1:  # continueのためのダミー
                 print("証拠金維持率が設定値を下回っているので購入処理をスキップします")
                 # buy_valueを確定させる
                 driver.get(yahoo_path)
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, now_value_path))
+                )
                 print(driver.current_url)
                 print("リロード判定のために要素を検索しています")
                 judgement=len(driver.find_elements(By.XPATH, now_value_path))
@@ -281,10 +298,10 @@ while now_value >= 1:  # continueのためのダミー
                 #リロード判定をする
                 while judgement==0:
                     print("現在の価格が取得できないためリロードを行います")
-                    sleep(5)
                     driver.get(yahoo_path)
-                    sleep(15)
-                    WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+                    WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.XPATH, now_value_path))
+                    )
                     print(driver.current_url)
                     judgement=len(driver.find_elements(By.XPATH, now_value_path))
                 now_value = driver.find_element(By.XPATH, now_value_path)
@@ -297,65 +314,85 @@ while now_value >= 1:  # continueのためのダミー
                 relod_count = 0
                 continue
 
-            elif marge_par<safe_marge:
+            else:
                 #注文期間を１年に変更する処理
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/label"))
+                )
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/label").click()
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[1]/ul/li[10]/div"))
+                )
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[1]/ul/li[10]/div").click()
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[1]/ul/li[10]/ul/li[4]/a"))
+                )
                 WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[1]/ul/li[10]/ul/li[4]/a").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[1]/section[1]/div/div/div[1]/dl[1]/dd/button"))
+                )
                 driver.find_element(
                     By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[1]/section[1]/div/div/div[1]/dl[1]/dd/button").click()
-                sleep(2)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)        
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[2]/div[2]/div/form/div[5]/label[3]"))
+                )       
                 driver.find_element(
                     By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[2]/div[2]/div/form/div[5]/label[3]").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[2]/div[2]/div/form/div[6]/button[1]"))
+                )    
                 driver.find_element(
                     By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[2]/div[2]/div/form/div[6]/button[1]").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[7]/div[3]/div/button"))
+                )    
                 driver.find_element(
                     By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[7]/div[3]/div/button").click()
-                sleep(1)
                 driver.get("https://trade.sbifxt.co.jp/aweb/home.jsp")
-                sleep(2)
                 print("設定変更完了")
 
                 buy_doller=int(buy_doller/2)
                 # 成行買い
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-                print(driver.current_url)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[1]/input[3]"))
+                )   
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[1]/input[3]").click()
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[4]/div/input[2]"))
+                )   
                 txtbox=driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[4]/div/input[2]")
                 txtbox.clear()
-                sleep(1)
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[4]/div/input[2]").send_keys(str(buy_doller))
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[7]/div[1]/label/span/span"))
+                )   
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[7]/div[1]/label/span/span").click()
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[8]/input"))
+                )   
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[8]/input").click()
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/div[5]/div[2]/div/form/div[1]/button[1]"))
+                )   
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/div[5]/div[2]/div/form/div[1]/button[1]").click()
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[8]/div/div[1]/input"))
+                )   
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[8]/div/div[1]/input").send_keys("50")
-                sleep(1)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[9]/div/div/div[1]/div[2]/p[2]"))
+                )   
                 driver.find_element(
                     By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[9]/div/div/div[1]/div[2]/p[2]").click()
 
@@ -365,7 +402,9 @@ while now_value >= 1:  # continueのためのダミー
                 driver.get(yahoo_path)
                 print("リロード判定のために要素を検索しています")
                 #読み込み待ちの処理
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+                WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.XPATH, now_value_path))
+                )   
                 print(driver.current_url)
                 judgement=len(driver.find_elements(By.XPATH, now_value_path))
                 print("要素の検索終了")
@@ -376,7 +415,9 @@ while now_value >= 1:  # continueのためのダミー
                     driver.get(yahoo_path)
                     sleep(2)
                     #読み込み待ちの処理
-                    WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
+                    WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.XPATH, now_value_path))
+                    )  
                     print(driver.current_url)
                     judgement=len(driver.find_elements(By.XPATH, now_value_path))
                 now_value = driver.find_element(By.XPATH, now_value_path)
@@ -388,92 +429,4 @@ while now_value >= 1:  # continueのためのダミー
                 now_value_list=[]
                 relod_count = 0
                 continue
-            else:
-                #注文期間を１年に変更する処理
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/label").click()
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[1]/ul/li[10]/div").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[1]/ul/li[10]/ul/li[4]/a").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
-                driver.find_element(
-                    By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[1]/section[1]/div/div/div[1]/dl[1]/dd/button").click()
-                sleep(2)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)        
-                driver.find_element(
-                    By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[2]/div[2]/div/form/div[5]/label[3]").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
-                driver.find_element(
-                    By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[2]/div[2]/div/form/div[6]/button[1]").click()
-                sleep(1)
-                WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located)
-                driver.find_element(
-                    By.XPATH, "/html/body/nav/div/div/div/div[3]/div[2]/div[7]/div[3]/div/button").click()
-                sleep(1)
-                driver.get("https://trade.sbifxt.co.jp/aweb/home.jsp")
-                sleep(2)
-                print("設定変更完了")
-
-                # 成行買い
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-                print(driver.current_url)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[1]/input[3]").click()
-                sleep(1)
-                txtbox=driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[4]/div/input[2]")
-                txtbox.clear()
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[4]/div/input[2]").send_keys(str(buy_doller))
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[7]/div[1]/label/span/span").click()
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[8]/input").click()
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/div[5]/div[2]/div/form/div[1]/button[1]").click()
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[8]/div/div[1]/input").send_keys("50")
-                sleep(1)
-                driver.find_element(
-                    By.XPATH, "/html/body/div[3]/nav/div/div/div/div[3]/div/div[1]/div[2]/div[1]/section/form/div[2]/div[9]/div/div/div[1]/div[2]/p[2]").click()
-                print("買い注文が完了しました")
-
-                # buy_valueを確定させる
-                driver.get(yahoo_path)
-                print("リロード判定のために要素を検索しています")
-                #読み込み待ちの処理
-                WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-                print(driver.current_url)
-                judgement=len(driver.find_elements(By.XPATH, now_value_path))
-                print("要素の検索終了")
-                #リロード判定をする
-                while judgement==0:
-                    print("現在の価格が取得できないためリロードを行います")
-                    sleep(2)
-                    driver.get(yahoo_path)
-                    sleep(2)
-                    #読み込み待ちの処理
-                    WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located)
-                    print(driver.current_url)
-                    judgement=len(driver.find_elements(By.XPATH, now_value_path))
-                now_value = driver.find_element(By.XPATH, now_value_path)
-                now_value = now_value.text.replace('\n', '')            
-                print("リロード完了")
-                now_value=float(now_value)
-                l_buy_value = now_value-0.3
-                print("次の買い価格は"+str(l_buy_value)+"です")
-                now_value_list=[]
-                relod_count = 0
-                continue
+        
