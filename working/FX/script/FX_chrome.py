@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 #linux・mac用(ラズパイで実行する場合はヘッドレスモードをオフにしないと正常に動作しないので注意)
 options = webdriver.ChromeOptions()
-#options.add_argument("--headless=new")
+options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-running-insecure-content')
@@ -18,12 +18,6 @@ options.add_argument('--disable-web-security')
 options.add_argument('--blink-settings=imagesEnabled=false')
 options.add_argument('--ignore-certificate-errors')
 driver = webdriver.Chrome(options=options)
-
-
-WebDriverWait(driver, 15).until(
-    EC.presence_of_element_located((By.XPATH, "/html/body/section/div[2]/div/div/form/div[1]/p[2]/input"))
-)
-
 
 #各種パス
 yahoo_path="https://finance.yahoo.co.jp/quote/USDJPY=FX"
