@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 #linux・mac用(ラズパイで実行する場合はヘッドレスモードをオフにしないと正常に動作しないので注意)
 options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
+#options.add_argument("--headless=new")
 options.add_argument('--disable-gpu')
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-running-insecure-content')
@@ -48,9 +48,9 @@ sleep(2)
 relod_count=0
 
 # 以下テスト
-#now_value = 130
-#l_buy_value = 152
-#relod_count = 240
+now_value = 130
+l_buy_value = 152
+relod_count = 240
 
 #現在の曜日・時刻を取得する。
 today = datetime.date.today()
@@ -203,7 +203,7 @@ while now_value >= 1:  # continueのためのダミー
             #SBI_FXトップ画面
             print(driver.current_url)
             #読み込み待ちの処理
-            input_element_user = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/section/div[2]/div/div/form/div[1]/p[2]/input")))
+            input_element_user = WebDriverWait(driver, 180).until(EC.element_to_be_clickable((By.XPATH, "/html/body/section/div[2]/div/div/form/div[1]/p[2]/input")))
             input_element_user.send_keys("7644016862")
             input_element_pass = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "/html/body/section/div[2]/div/div/form/div[1]/p[3]/input")))
             input_element_pass.send_keys("guxvudfarqy8TarhGj")
