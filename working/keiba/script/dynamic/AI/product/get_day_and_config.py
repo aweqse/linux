@@ -29,8 +29,8 @@ mkdir_path_2="/home/aweqse/keiba/output/"+ymd+"/before_30min"
 mkdir_path_3="/home/aweqse/keiba/output/"+ymd+"/before_10min"
 mkdir_path_4="/home/aweqse/keiba/output/"+ymd+"/before_05min"
 mkdir_path_5="/home/aweqse/keiba/output/"+ymd+"/racedata"
-py_path_1=   "/home/aweqse/keiba/script/dynamic/AI/pre_race_fetch/get_racetime.py"
-py_path_2=   "/home/aweqse/keiba/script/dynamic/AI/pre_race_fetch/get_odds.py"
+py_path_1=   "/home/aweqse/keiba/script/dynamic/AI/product/get_racetime.py"
+py_path_2=   "/home/aweqse/keiba/script/dynamic/AI/product/get_odds.py"
 
 def get_hour_min():
     now = datetime.now() #時刻を更新するのでか鳴らす呼び出す
