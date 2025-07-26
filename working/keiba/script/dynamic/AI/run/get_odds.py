@@ -1,40 +1,23 @@
-from datetime import datetime
-from selenium import webdriver
 import pandas as pd
 from time import sleep
 import re
 from selenium.webdriver.support.ui import Select
-import subprocess
-import get_day_and_config
+import get_day_and_config as config
 import get_racedata
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
-#リソース確保のため chromeを終了する
-subprocess.run(["pkill","chrome"])
-
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-options.add_argument('--disable-gpu')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--allow-running-insecure-content')
-options.add_argument('--disable-web-security')
-options.add_argument('--blink-settings=imagesEnabled=false')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--no-sandbox')
-
-driver = webdriver.Chrome(options=options)
-
 def main():
+    config.get_pkill()
     win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id=read_csv()
     get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id)
 
-
 def read_csv():
+    ymd=config.get_ymd()
     print("urlの格納開始")
-    ymd=get_day_and_config.ymd
+
     #csvファイルを読み取りレースIDを抽出しURLを生成する
     path_1="/home/aweqse/keiba/output/"+str(ymd)+"/"+str(ymd)+"_racetime.csv"
     
@@ -98,10 +81,10 @@ def read_csv():
     return win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id
 
 def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id):
-    ymd=get_day_and_config.ymd
-    
     #初期値
-    hour_min=get_day_and_config.hour_min
+    ymd=config.get_ymd()
+    driver=config.get_driver()
+    hour_min=config.get_hour_min()
 
 #     #テスト用パラメーター
 #     hour_min_array=[
@@ -259,7 +242,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_win = driver.find_elements(By.CLASS_NAME, class_path_win_place)
             
             #単勝の取得時刻を取得する
-            win_time=get_day_and_config.hour_min
+            win_time=config.get_hour_min()
             print("単勝・複勝の情報取得完了")
             
             #単勝,複勝の情報を加工する
@@ -357,10 +340,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_umaren = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")
             
             #馬連の取得時効を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            umaren_time=hour*60+minute 
+            umaren_time=config.get_hour_min()
             print("馬連の情報取得終了")
 
             #馬連の情報を加工する
@@ -452,10 +432,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_wide = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
 
             #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            wide_time=hour*60+minute
+            wide_time=config.get_hour_min
             print("ワイドの情報取得完了") 
 
             #配列を整形する
@@ -541,10 +518,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")
 
             #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            sanrenpuku_time=hour*60+minute 
+            sanrenpuku_time=config.get_hour_min
             print("三連複の情報取得終了")    
             
             #三連複の要素を取得する
@@ -659,7 +633,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
         sleep(20)
 
         #本番は以下のコメントアウトを外す
-        hour_min=get_day_and_config.hour_min
+        hour_min=config.get_hour_min()
         
         # #テスト用パラメーター
         # hour_min=hour_min+1

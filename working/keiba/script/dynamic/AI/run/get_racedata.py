@@ -1,39 +1,25 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
 import re
-import get_day_and_config
+import get_day_and_config as config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def selenium():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument('--disable-gpu')
-    options.add_argument('--ignore-certificate-errors') 
-    options.add_argument('--allow-running-insecure-content')
-    options.add_argument('--disable-web-security')
-    options.add_argument('--blink-settings=imagesEnabled=false')
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--no-sandbox')
-
-    driver = webdriver.Chrome(options=options)
-    return driver
-
 def main(load_url,marge_cach):
-    driver=selenium()
-    total_array,race_id=get_and_prosees_data(driver,load_url,marge_cach)
+    config.get_pkill()
+    total_array,race_id=get_and_prosees_data(load_url,marge_cach)
     export_csv(total_array,race_id)
 
-def  get_and_prosees_data(driver,load_url,marge_cach):
-    year_now=get_day_and_config.year_now
-    month_now=get_day_and_config.month_now
-    day_now=get_day_and_config.day_now
-    weekday_sat=get_day_and_config.weekday_sat
-    weekday_sun=get_day_and_config.weekday_sun
-    weekday_oth=get_day_and_config.weekday_oth
+def  get_and_prosees_data(load_url,marge_cach):
+    driver=config.get_driver()
+    year_now=config.get_year()
+    month_now=config.get_month()
+    day_now=config.get_day()
+    weekday_sat=config.get_weekday_sat()
+    weekday_sun=config.get_weekday_sun()
+    weekday_oth=config.get_weekday_oth()
 
     print("ヘッダーの情報格納開始")
 
@@ -491,7 +477,7 @@ def  get_and_prosees_data(driver,load_url,marge_cach):
     return total_array,race_id
 
 def export_csv(total_array,race_id):
-    ymd=get_day_and_config.ymd
+    ymd=config.get_ymd()
     print("csvに出力開始")
     path_1="/home/aweqse/keiba/output/"+ymd+"/racedata/"+str(race_id)+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)

@@ -1,39 +1,21 @@
-from datetime import datetime
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
 import re
 import csv
-import subprocess
-import get_day_and_config
-
-#リソース確保のため chromeを終了する
-subprocess.run(["pkill","chrome"])
-
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-options.add_argument('--disable-gpu')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--allow-running-insecure-content')
-options.add_argument('--disable-web-security')
-options.add_argument('--blink-settings=imagesEnabled=false')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--no-sandbox')
-
-driver = webdriver.Chrome(options=options)
+import get_day_and_config as config
 
 def main():
-    starttime_array,match_check_word=get_element()
+    config.get_pkill()
+    driver=config.get_driver()
+    starttime_array,match_check_word=get_element(driver)
     alltime_array=process_date(starttime_array,match_check_word)
     export_csv(alltime_array)
 
 
 #発送時刻を取得し加工する
-def get_element():
-    #urlのため曜日を結合する
-    ymd=get_day_and_config.ymd
-    load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date="+ymd
-    
+def get_element(driver):
+    load_url=config.racetime_load_url
+
     #テスト用のURL
     #load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date=20250713"
 
@@ -123,9 +105,9 @@ def process_date(starttime_array,match_check_word):
             #発送時刻を変数に格納する
             starttime=int(hour)*60+int(minute)
             #race_idを生成する
-            year=get_day_and_config.year_now
-            month=get_day_and_config.month_now
-            day=get_day_and_config.day_now
+            year=config.get_year()
+            month=config.get_month()
+            day=config.get_day()
             race_id=year+place_cache+kai+nitime+race
 
             #配列に挿入する
@@ -138,10 +120,7 @@ def process_date(starttime_array,match_check_word):
     return alltime_array
     
 def export_csv(alltime_array):
-    ymd=get_day_and_config.ymd
-    #path="/home/aweqse/"+ymd+"_racetime.csv"
-    path="/home/aweqse/keiba/output/"+ymd+"/"+ymd+"_racetime.csv"
-    #path="C:\\workspace\\プログラム\\競馬\\AI\\"+ymd+"_racetime.csv"
+    path=config.racetime_export_path
     with open(path, "w", newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerows(alltime_array)
