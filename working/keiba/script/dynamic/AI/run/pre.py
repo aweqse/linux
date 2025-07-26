@@ -5,23 +5,11 @@ from selenium.webdriver.common.by import By
 import re
 import sys
 import subprocess
-import get_day_and_config
+import get_day_and_config as config
 
 sleep(10)
-#リソース確保のため chromeを終了する
-subprocess.run(["pkill","chrome"])
-
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-options.add_argument('--disable-gpu')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--allow-running-insecure-content')
-options.add_argument('--disable-web-security')
-options.add_argument('--blink-settings=imagesEnabled=false')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--no-sandbox')
-
-driver = webdriver.Chrome(options=options)
+driver=config.get_driver()
+md=config.get_md()
 
 #今日がレースの日なのかを判定するための情報を取得する
 load_url="https://race.netkeiba.com/top/"
@@ -59,19 +47,19 @@ while len(day_elem)>day_count:
     day_count=day_count+1
 
 #今日がレース日かを判定する
-md=get_day_and_config.md
+
 
 #テスト用パラメーター
 #md="0713"
 
 if md in check_array:
-    mkdir_path_1=get_day_and_config.mkdir_path_1
-    mkdir_path_2=get_day_and_config.mkdir_path_2
-    mkdir_path_3=get_day_and_config.mkdir_path_3
-    mkdir_path_4=get_day_and_config.mkdir_path_4
-    mkdir_path_5=get_day_and_config.mkdir_path_5
-    py_path_1=get_day_and_config.py_path_1
-    py_path_2=get_day_and_config.py_path_2
+    mkdir_path_1=config.mkdir_path_1
+    mkdir_path_2=config.mkdir_path_2
+    mkdir_path_3=config.mkdir_path_3
+    mkdir_path_4=config.mkdir_path_4
+    mkdir_path_5=config.mkdir_path_5
+    py_path_1=config.py_path_1
+    py_path_2=config.py_path_2
 
     #生成したファイルを格納するフォルダを作る
     subprocess.run(["mkdir",mkdir_path_1])

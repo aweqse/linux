@@ -66,6 +66,9 @@ def get_month():
 def get_day():
     return day_str
 
+def get_md():
+    return md
+
 def get_ymd():
     return ymd
 
@@ -78,7 +81,6 @@ def get_driver():
     options.add_argument('--disable-web-security')
     options.add_argument('--blink-settings=imagesEnabled=false')
     options.add_argument('--no-sandbox')
-
     driver = webdriver.Chrome(options=options)
     return driver
 
