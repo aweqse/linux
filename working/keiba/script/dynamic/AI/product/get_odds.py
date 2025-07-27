@@ -214,30 +214,47 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             racedata_csv=                "/home/aweqse/keiba/output/"+ymd+"/racedata/"+str(str_race_id)+ "_racedate.csv"
             
             print("処理を開始します。")
-
-            #単勝・複勝のオッズを取得する
-            print("単勝・複勝の情報取得開始")
-            driver.get(load_url_win)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
-                    WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
             
+            #読み込み処理
+            print("単勝・複勝の情報取得開始")
+            try:
+                driver.get(load_url_win)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_win_place}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    driver.quit()
+                    driver = config.get_driver()
+                    try:
+                        driver.get(load_url_win)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_win_place}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
+                    
+
             #要素を変数に格納する
             elements_win = driver.find_elements(By.CLASS_NAME, class_path_win_place)
             
@@ -308,33 +325,45 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("単勝と複勝の処理完了")
 
 
-                
-            
-
-
-            #馬連の要素を取得する
+            #読み込み処理
             print("馬連の情報取得開始")
-            driver.get(load_url_umaren)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
+            try:
+                driver.get(load_url_umaren)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
-            
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_umaren}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    driver.quit()
+                    driver = config.get_driver()
+                    try:
+                        driver.get(load_url_umaren)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_umaren}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
+                    
             
             #要素を変数に格納する
             elements_umaren = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")
@@ -407,26 +436,42 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
             #ワイドの要素を取得する
             print("ワイドの情報取得開始")
-            driver.get(load_url_wide)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
+            try:
+                driver.get(load_url_wide)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_wide}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    driver.quit()
+                    driver = config.get_driver()
+                    try:
+                        driver.get(load_url_wide)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_wide}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
             
             #要素を変数に格納する
             elements_wide = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
@@ -493,26 +538,42 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
 
             print("三連複の情報取得開始")
-            driver.get(load_url_sanrenpuku)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
+            try:
+                driver.get(load_url_sanrenpuku)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    driver.quit()
+                    driver = config.get_driver()
+                    try:
+                        driver.get(load_url_sanrenpuku)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
             
             #要素を変数に格納する
             elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")
