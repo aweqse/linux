@@ -1,5 +1,3 @@
-from datetime import datetime
-from selenium import webdriver
 from time import sleep
 from selenium.webdriver.common.by import By
 import re
@@ -8,6 +6,10 @@ import subprocess
 import get_day_and_config as config
 
 sleep(10)
+#リソースの記録開始
+subprocess.run(["bash","/home/aweqse/keiba/script/dynamic/AI/product/resource_log.sh"])
+
+
 driver=config.get_driver()
 md=config.get_md()
 
