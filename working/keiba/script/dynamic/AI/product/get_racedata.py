@@ -506,4 +506,4 @@ if __name__ == "__main__":
     odds_rank = 2
     win_time = 10  # オッズ取得時刻（例：発走10分前）
 
-    main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
+    main(load_url,marge_cach)
