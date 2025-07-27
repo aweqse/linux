@@ -57,37 +57,50 @@ def  get_and_prosees_data(load_url,marge_cach):
     class_path_3="RaceTableArea"
     print("urlが読み込まれているかをチェックします。")
     
-    driver.get(load_url)
-    page_state=driver.execute_script("return document.readyState")
-    sleep(5)
-    if page_state=="complete":
-        print("url読み込み完了")
-        #xpathが完全に読み込まれるまで待機する
-        WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
 
-        #class_path_2はある場合とない場合があるので含めない
+    try:
+        driver.get(load_url)
+        sleep(5)
+        page_state = driver.execute_script("return document.readyState")
 
-        WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
-    else:
-        while True:
-            print("URLの読み込みに失敗したため再読み込みします。")
-            driver.get(load_url)
-            sleep(10)
-
+        if page_state == "complete":
+            print("url読み込み完了")
             WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
 
             #class_path_2はある場合とない場合があるので含めない
-
             WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))           
-            page_state=driver.execute_script("return document.readyState")
-            if page_state=="complete":
-                break
-            else:
-                continue           
+            EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
+        else:
+            raise Exception("ページ状態が不完全")
+
+    except Exception as e:
+        print("初回読み込み失敗")
+        retry_count = 0
+        max_retry = 10
+        while retry_count < max_retry:
+            print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+            driver.quit()
+            driver = config.get_driver()
+            try:
+                driver.get(load_url)
+                sleep(5)
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
+
+                #class_path_2はある場合とない場合があるので含めない
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
+                page_state = driver.execute_script("return document.readyState")
+                if page_state == "complete":
+                    print("再読み込み成功")
+                    break
+            except Exception as e2:
+                print(f"[RETRY ERROR] {e2}")
+            retry_count += 1
+
+        if retry_count == max_retry:
+            print("URLの読み込みに3回失敗したため、スキップします。")
     
     grade_dict={
         "Icon_GradeType Icon_GradeType1": "G1",
