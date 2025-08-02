@@ -485,6 +485,7 @@ def  get_and_prosees_data(load_url,marge_cach):
     print("要素の分離と配列の格納完了")
     #chromeを閉じる
     driver.quit()
+    driver = config.get_driver()
     print("情報取得完了!!")
     return total_array,race_id
 

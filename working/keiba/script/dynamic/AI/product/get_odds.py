@@ -345,8 +345,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 max_retry = 10
                 while retry_count < max_retry:
                     print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
-                    driver.quit()
-                    driver = config.get_driver()
                     try:
                         driver.get(load_url_umaren)
                         sleep(5)
@@ -454,8 +452,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 max_retry = 10
                 while retry_count < max_retry:
                     print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
-                    driver.quit()
-                    driver = config.get_driver()
                     try:
                         driver.get(load_url_wide)
                         sleep(5)
@@ -477,7 +473,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_wide = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
 
             #現在の時刻を取得する
-            wide_time=config.get_hour_min
+            wide_time=config.get_hour_min()
             print("ワイドの情報取得完了") 
 
             #配列を整形する
@@ -556,8 +552,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
                 max_retry = 10
                 while retry_count < max_retry:
                     print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
-                    driver.quit()
-                    driver = config.get_driver()
                     try:
                         driver.get(load_url_sanrenpuku)
                         sleep(5)
@@ -579,7 +573,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")
 
             #現在の時刻を取得する
-            sanrenpuku_time=config.get_hour_min
+            sanrenpuku_time=config.get_hour_min()
             print("三連複の情報取得終了")    
             
             #三連複の要素を取得する
