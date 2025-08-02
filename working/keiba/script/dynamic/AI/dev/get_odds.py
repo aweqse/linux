@@ -624,6 +624,10 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             df_4.to_csv(csv_path_1, index=False, header=False, encoding='utf-8-sig') 
             print("三連複の処理終了")
 
+            #メモリ節約のため一旦、chromeを終了する
+            driver.quit()
+            driver = get_day_and_config.get_driver()
+
             #時刻(分)を進めないと二重処理になるため1分待機する
             print("取得が完了したので待機します")
 
