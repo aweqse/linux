@@ -490,9 +490,9 @@ def  get_and_prosees_data(load_url,marge_cach):
     return total_array,race_id
 
 def export_csv(total_array,race_id):
-    ymd=config.get_ymd()
+    export_path=config.racedate_export_csv
     print("csvに出力開始")
-    path_1="/home/aweqse/keiba/output/"+ymd+"/racedata/"+str(race_id)+ "_racedate.csv"
+    path_1=export_path+str(race_id)+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")

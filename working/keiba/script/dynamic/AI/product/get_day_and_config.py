@@ -22,6 +22,7 @@ year_str = str(year_now)
 md=month_str+day_str
 ymd=year_str+month_str+day_str
 
+racedate_export_csv="/home/aweqse/keiba/output/"+ymd+"/racedata/"
 racetime_export_path="/home/aweqse/keiba/output/"+ymd+"/"+ymd+"_racetime.csv"
 racetime_load_url="https://race.netkeiba.com/top/race_list.html?kaisai_date="+ymd
 mkdir_path_1="/home/aweqse/keiba/output/"+ymd
@@ -75,12 +76,14 @@ def get_ymd():
 def get_driver():
     options = webdriver.ChromeOptions()
     options.add_argument("--headless=new")
-    options.add_argument('--disable-gpu')
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--allow-running-insecure-content')
-    options.add_argument('--disable-web-security')
-    options.add_argument('--blink-settings=imagesEnabled=false')
-    options.add_argument('--no-sandbox')
+    options.add_argument("--window-size=1280,2000")
+    options.add_argument("--lang=ja-JP")
+    options.add_argument("--blink-settings=imagesEnabled=false")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-background-networking")
+    options.add_argument("--disable-sync")
+    options.add_argument("--disable-default-apps")
+    options.add_argument("--disable-translate")
     driver = webdriver.Chrome(options=options)
     return driver
 
