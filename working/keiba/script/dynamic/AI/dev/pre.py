@@ -81,8 +81,8 @@ if md in check_array:
     subprocess.run(["mkdir",mkdir_path_5])
     
     #プログラムを起動する
-    subprocess.run(["python3",py_path_1])
-    subprocess.run(["python3",py_path_2])
+    subprocess.run(["/home/aweqse/venv/bin/python",py_path_1])
+    subprocess.run(["/home/aweqse/venv/bin/python",py_path_2])
     subprocess.run(["pkill","chrome"])
 
 else:
