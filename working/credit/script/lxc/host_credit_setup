@@ -1,0 +1,7 @@
+#!/bin/bash
+sudo ufw allow 22/tcp
+sudo ufw enable
+cp /root/conf/lxc/200.conf /etc/pve/lxc/200.conf
+pct reboot 200
+
+

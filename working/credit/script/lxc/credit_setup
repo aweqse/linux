@@ -1,0 +1,65 @@
+#!/bin/bash
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove
+
+#nano
+sudo apt install nano -y
+
+#ping
+sudo apt install iputils-ping -y
+
+#SSH
+sudo apt install openssh-server -y
+
+#cron
+sudo apt install cron -y
+
+#chromeをインストール
+# 1. 必要なツールをインストール
+sudo apt update
+sudo apt install -y wget gnupg
+# 2. Googleの署名鍵を取得して登録
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-linux-signing-key.gpg
+# 3. Chromeのリポジトリを追加
+echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+# 4. パッケージリストを更新
+sudo apt update
+# 5. Google Chromeをインストール（Stable版）
+sudo apt install -y google-chrome-stable
+
+#pythoのフルパッケージをインストールする
+sudo apt install -y python3-venv python3-full
+
+#pipの仮想環境をインストールする
+# Python仮想環境を作成
+python3 -m venv ~/venv
+# 仮想環境を有効化
+source ~/venv/bin/activate
+
+#pipをインストール
+python -m ensurepip --upgrade
+
+#pipライブラリをインストール
+#credit
+pip install selenium
+pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+#crontab
+crontab /home/aweqse/credit/crontab/credit_crontab
+sudo crontab /home/aweqse/credit/crontab/sudo_credit_crontab
+
+#ipアドレスの設定アドレスの設定
+sudo rm /etc/netplan/*
+sudo cp /home/aweqse/credit/conf/01-netplan-v.yaml /etc/netplan/01-netplan-v.yaml
+sudo netplan apply
+
+#タイムゾーンを変更する
+sudo timedatectl set-timezone Asia/Tokyo
+
+
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y autoremove 
+

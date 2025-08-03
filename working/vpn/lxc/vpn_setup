@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#パッケージの更新
+apt update -y
+apt upgrade -y
+apt autoremove -y
+
+#ファイアーウォールの設定
+ufw allow ssh
+ufw allow 443
+ufw allow 500
+ufw allow 4500
+ufw allow 5555
+ufw enable -y
+
+#インストールと自動起動
+apt-get install softether-vpnserver
+systemctl start softether-vpnserver.service
+systemctl enable softether-vpnserver.service
+
+#サービスに登録するためコンフィグを移動する
+cp /home/aweqse/vpn/conf/vpn_server.config /var/lib/softether/vpn_server.config
+
+apt update -y
+apt upgrade -y
+apt autoremove -y
