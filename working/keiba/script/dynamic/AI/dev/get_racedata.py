@@ -1,40 +1,24 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from time import sleep
 import pandas as pd
 import re
-import get_day_and_config
+import get_day_and_config as config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-
-def selenium():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument('--disable-gpu')
-    options.add_argument('--ignore-certificate-errors') 
-    options.add_argument('--allow-running-insecure-content')
-    options.add_argument('--disable-web-security')
-    options.add_argument('--blink-settings=imagesEnabled=false')
-    options.add_argument('--ignore-certificate-errors')
-    options.add_argument('--no-sandbox')
-
-    driver = webdriver.Chrome(options=options)
-    return driver
 
 def main(load_url,marge_cach):
-    driver=selenium()
-    total_array,race_id=get_and_prosees_data(driver,load_url,marge_cach)
+    config.get_pkill()
+    total_array,race_id=get_and_prosees_data(load_url,marge_cach)
     export_csv(total_array,race_id)
 
-def  get_and_prosees_data(driver,load_url,marge_cach):
-    year_now=get_day_and_config.year_now
-    month_now=get_day_and_config.month_now
-    day_now=get_day_and_config.day_now
-    weekday_sat=get_day_and_config.weekday_sat
-    weekday_sun=get_day_and_config.weekday_sun
-    weekday_oth=get_day_and_config.weekday_oth
+def  get_and_prosees_data(load_url,marge_cach):
+    driver=config.get_driver()
+    year_now=config.get_year()
+    month_now=config.get_month()
+    day_now=config.get_day()
+    weekday_sat=config.get_weekday_sat()
+    weekday_sun=config.get_weekday_sun()
+    weekday_oth=config.get_weekday_oth()
 
     print("ヘッダーの情報格納開始")
 
@@ -72,37 +56,50 @@ def  get_and_prosees_data(driver,load_url,marge_cach):
     class_path_3="RaceTableArea"
     print("urlが読み込まれているかをチェックします。")
     
-    driver.get(load_url)
-    page_state=driver.execute_script("return document.readyState")
-    sleep(5)
-    if page_state=="complete":
-        print("url読み込み完了")
-        #xpathが完全に読み込まれるまで待機する
-        WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
 
-        #class_path_2はある場合とない場合があるので含めない
+    try:
+        driver.get(load_url)
+        sleep(5)
+        page_state = driver.execute_script("return document.readyState")
 
-        WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
-    else:
-        while True:
-            print("URLの読み込みに失敗したため再読み込みします。")
-            driver.get(load_url)
-            sleep(10)
-
+        if page_state == "complete":
+            print("url読み込み完了")
             WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
 
             #class_path_2はある場合とない場合があるので含めない
-
             WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))           
-            page_state=driver.execute_script("return document.readyState")
-            if page_state=="complete":
-                break
-            else:
-                continue           
+            EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
+        else:
+            raise Exception("ページ状態が不完全")
+
+    except Exception as e:
+        print("初回読み込み失敗")
+        retry_count = 0
+        max_retry = 10
+        while retry_count < max_retry:
+            print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+            driver.quit()
+            driver = config.get_driver()
+            try:
+                driver.get(load_url)
+                sleep(5)
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, class_path_1)))
+
+                #class_path_2はある場合とない場合があるので含めない
+                WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, class_path_3)))
+                page_state = driver.execute_script("return document.readyState")
+                if page_state == "complete":
+                    print("再読み込み成功")
+                    break
+            except Exception as e2:
+                print(f"[RETRY ERROR] {e2}")
+            retry_count += 1
+
+        if retry_count == max_retry:
+            print("URLの読み込みに3回失敗したため、スキップします。")
     
     grade_dict={
         "Icon_GradeType Icon_GradeType1": "G1",
@@ -488,13 +485,14 @@ def  get_and_prosees_data(driver,load_url,marge_cach):
     print("要素の分離と配列の格納完了")
     #chromeを閉じる
     driver.quit()
+    driver = config.get_driver()
     print("情報取得完了!!")
     return total_array,race_id
 
 def export_csv(total_array,race_id):
-    ymd=get_day_and_config.ymd
+    export_path=config.racedate_export_csv
     print("csvに出力開始")
-    path_1="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata/"+str(race_id)+ "_racedate.csv"
+    path_1=export_path+str(race_id)+ "_racedate.csv"
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")
@@ -508,4 +506,4 @@ if __name__ == "__main__":
     odds_rank = 2
     win_time = 10  # オッズ取得時刻（例：発走10分前）
 
-    main(load_url,odds_win,min_odds_place,max_odds_place,odds_rank,win_time)
+    main(load_url,marge_cach)

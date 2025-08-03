@@ -1,45 +1,28 @@
-from datetime import datetime
-from selenium import webdriver
 import pandas as pd
 from time import sleep
 import re
 from selenium.webdriver.support.ui import Select
-import subprocess
-import get_day_and_config
+import get_day_and_config as config
 import get_racedata
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 
-#リソース確保のため chromeを終了する
-subprocess.run(["pkill","chrome"])
-
-options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")
-options.add_argument('--disable-gpu')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--allow-running-insecure-content')
-options.add_argument('--disable-web-security')
-options.add_argument('--blink-settings=imagesEnabled=false')
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--no-sandbox')
-
-driver = webdriver.Chrome(options=options)
-
 def main():
+    config.get_pkill()
     win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id=read_csv()
     get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id)
 
-
 def read_csv():
+    ymd=config.get_ymd()
     print("urlの格納開始")
-    ymd=get_day_and_config.ymd
+
     #csvファイルを読み取りレースIDを抽出しURLを生成する
-    path_1="/home/aweqse/dev/working/keiba/output/"+str(ymd)+"/"+str(ymd)+"_racetime.csv"
+    path_1="/home/aweqse/keiba/output/"+str(ymd)+"/"+str(ymd)+"_racetime.csv"
     
     #テスト用
-    #path_1="/home/aweqse/dev/working/keiba/output/20250715/20250715_racetime.csv" 
+    #path_1="/home/aweqse/keiba/output/20250715/20250715_racetime.csv" 
 
     df = pd.read_csv(path_1,index_col=False)
     #csvファイルから情報を読み取る
@@ -98,10 +81,10 @@ def read_csv():
     return win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id
 
 def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,before_10min,before_5min,racedata_dict,race_id):
-    ymd=get_day_and_config.ymd
-    
     #初期値
-    hour_min=get_day_and_config.hour_min
+    ymd=config.get_ymd()
+    driver=config.get_driver()
+    hour_min=config.get_hour_min()
 
 #     #テスト用パラメーター
 #     hour_min_array=[
@@ -210,57 +193,73 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             elem_3_array=[]
             elem_4_array=[]
 
-            xpath_prudown=     "Axis_Horse_selectbox"
-            class_path_win_place="RaceOdds_HorseList_Table"#他候補　"Ninki" RaceOdds_HorseList Tanfuku
-            class_path_umaren= "Odds_Type_b4" #他候補"RaceOdds_HorseList_Table" "Ninki"
-            class_path_wide="Odds_Type_b5" #他候補"RaceOdds_HorseList_Table" "Ninki" 
+            xpath_prudown=        "Axis_Horse_selectbox"
+            class_path_win_place= "RaceOdds_HorseList_Table"#他候補　"Ninki" RaceOdds_HorseList Tanfuku
+            class_path_umaren=    "Odds_Type_b4" #他候補"RaceOdds_HorseList_Table" "Ninki"
+            class_path_wide=      "Odds_Type_b5" #他候補"RaceOdds_HorseList_Table" "Ninki" 
             class_path_sanrenpuku="Odds_Type_b7" #他候補　"RaceOdds_HorseList_Table" "Ninki" 
                     
-            before_30min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_win_place_odds.csv"
-            before_30min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_30min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_30min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_10min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_win_place_odds.csv"
-            before_10min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_10min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_10min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            before_5min_win_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_win_place_odds.csv"
-            before_5min_umaren_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_umaren_odds.csv"
-            before_5min_wide_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
-            before_5min_sanrenpuku_path="/home/aweqse/dev/working/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
-            marge_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/"+str(str_race_id)+ "_after_marge.csv"
-            racedata_csv="/home/aweqse/dev/working/keiba/output/"+ymd+"/racedata/"+str(str_race_id)+ "_racedate.csv"
+            before_30min_win_path=       "/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_30min_umaren_path=    "/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_30min_wide_path=      "/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_30min_sanrenpuku_path="/home/aweqse/keiba/output/"+ymd+"/before_30min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_10min_win_path=       "/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_10min_umaren_path=    "/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_10min_wide_path=      "/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_10min_sanrenpuku_path="/home/aweqse/keiba/output/"+ymd+"/before_10min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            before_5min_win_path=        "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_win_place_odds.csv"
+            before_5min_umaren_path=     "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_umaren_odds.csv"
+            before_5min_wide_path=       "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_wide_odds.csv"
+            before_5min_sanrenpuku_path= "/home/aweqse/keiba/output/"+ymd+"/before_05min/"+str(str_race_id)+ "_sanrenpuku_odds.csv"
+            racedata_csv=                "/home/aweqse/keiba/output/"+ymd+"/racedata/"+str(str_race_id)+ "_racedate.csv"
             
             print("処理を開始します。")
-
-            #単勝・複勝のオッズを取得する
-            print("単勝・複勝の情報取得開始")
-            driver.get(load_url_win)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
-                    WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_win_place}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
             
+            #読み込み処理
+            print("単勝・複勝の情報取得開始")
+            try:
+                driver.get(load_url_win)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
+                    WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_win_place}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    driver.quit()
+                    driver = config.get_driver()
+                    try:
+                        driver.get(load_url_win)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_win_place}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
+                    
+
             #要素を変数に格納する
             elements_win = driver.find_elements(By.CLASS_NAME, class_path_win_place)
             
             #単勝の取得時刻を取得する
-            win_time=get_day_and_config.hour_min
+            win_time=config.get_hour_min()
             print("単勝・複勝の情報取得完了")
             
             #単勝,複勝の情報を加工する
@@ -326,42 +325,49 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             print("単勝と複勝の処理完了")
 
 
-                
-            
-
-
-            #馬連の要素を取得する
+            #読み込み処理
             print("馬連の情報取得開始")
-            driver.get(load_url_umaren)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
+            try:
+                driver.get(load_url_umaren)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
-            
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_umaren}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    try:
+                        driver.get(load_url_umaren)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_umaren}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
+                    
             
             #要素を変数に格納する
             elements_umaren = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_umaren}')]")
             
             #馬連の取得時効を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            umaren_time=hour*60+minute 
+            umaren_time=config.get_hour_min()
             print("馬連の情報取得終了")
 
             #馬連の情報を加工する
@@ -428,35 +434,46 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
             #ワイドの要素を取得する
             print("ワイドの情報取得開始")
-            driver.get(load_url_wide)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
+            try:
+                driver.get(load_url_wide)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_wide}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    try:
+                        driver.get(load_url_wide)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_wide}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
             
             #要素を変数に格納する
             elements_wide = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_wide}')]")
 
             #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            wide_time=hour*60+minute
+            wide_time=config.get_hour_min()
             print("ワイドの情報取得完了") 
 
             #配列を整形する
@@ -517,35 +534,46 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
 
 
             print("三連複の情報取得開始")
-            driver.get(load_url_sanrenpuku)
-            page_state=driver.execute_script("return document.readyState")
-            sleep(5)
-            if page_state=="complete":
-                print("url読み込み完了")
-                #xpathが完全に読み込まれるまで待機する
-                WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
-            else:
-                while True:
-                    print("URLの読み込みに失敗したため再読み込みします。")
-                    driver.get(load_url_win)
-                    sleep(10)
+            try:
+                driver.get(load_url_sanrenpuku)
+                sleep(5)
+                page_state = driver.execute_script("return document.readyState")
+
+                if page_state == "complete":
+                    print("url読み込み完了")
                     WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
-                    page_state=driver.execute_script("return document.readyState")
-                    if page_state=="complete":
-                        break
-                    else:
-                        continue
+                        EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
+                else:
+                    raise Exception("ページ状態が不完全")
+
+            except Exception as e:
+                print("初回読み込み失敗")
+                retry_count = 0
+                max_retry = 10
+                while retry_count < max_retry:
+                    print(f"URLの読み込みに失敗したため再読み込みします（{retry_count+1}/{max_retry}）")
+                    try:
+                        driver.get(load_url_sanrenpuku)
+                        sleep(5)
+                        WebDriverWait(driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, f"//*[contains(@class, '{class_path_sanrenpuku}')]")))
+                        page_state = driver.execute_script("return document.readyState")
+                        if page_state == "complete":
+                            print("再読み込み成功")
+                            break
+                    except Exception as e2:
+                        print(f"[RETRY ERROR] {e2}")
+                    retry_count += 1
+
+                if retry_count == max_retry:
+                    print("URLの読み込みに3回失敗したため、スキップします。")
+                    break
             
             #要素を変数に格納する
             elements_sanrenpuku_1 = driver.find_elements(By.XPATH,f"//*[contains(@class, '{class_path_sanrenpuku}')]")
 
             #現在の時刻を取得する
-            now = datetime.now()
-            hour = now.hour
-            minute = now.minute
-            sanrenpuku_time=hour*60+minute 
+            sanrenpuku_time=config.get_hour_min()
             print("三連複の情報取得終了")    
             
             #三連複の要素を取得する
@@ -624,10 +652,6 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
             df_4.to_csv(csv_path_1, index=False, header=False, encoding='utf-8-sig') 
             print("三連複の処理終了")
 
-            #メモリ節約のため一旦、chromeを終了する
-            driver.quit()
-            driver = get_day_and_config.get_driver()
-
             #時刻(分)を進めないと二重処理になるため1分待機する
             print("取得が完了したので待機します")
 
@@ -664,7 +688,7 @@ def get_odds(win_array,umaren_array,wide_1array,sanrenpuku_array,before_30min,be
         sleep(20)
 
         #本番は以下のコメントアウトを外す
-        hour_min=get_day_and_config.hour_min
+        hour_min=config.get_hour_min()
         
         # #テスト用パラメーター
         # hour_min=hour_min+1
