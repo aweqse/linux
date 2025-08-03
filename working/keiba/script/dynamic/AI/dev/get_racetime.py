@@ -120,8 +120,8 @@ def process_date(starttime_array,match_check_word):
     return alltime_array
     
 def export_csv(alltime_array):
-    path=config.racetime_export_path
-    with open(path, "w", newline='', encoding='utf-8') as f:
+    racetime_export_path=config.racetime_export_path
+    with open(racetime_export_path, "w", newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerows(alltime_array)
 
