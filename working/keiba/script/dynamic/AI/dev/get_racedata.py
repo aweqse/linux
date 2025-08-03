@@ -458,8 +458,8 @@ def  get_and_prosees_data(load_url,marge_cach):
                 #馬番からオッズを格納する
                 odds_search_count=0
                 while len(marge_cach)>odds_search_count:
-                    check_3=str(marge_cach[odds_search_count][0])
-                    if check_3==int(umaban):
+                    check_3=marge_cach[odds_search_count][0]
+                    if check_3==(umaban):
                         odds_win=marge_cach[odds_search_count][1]
                         min_odds_place=marge_cach[odds_search_count][2]
                         max_odds_place=marge_cach[odds_search_count][3]
@@ -496,17 +496,3 @@ def export_csv(total_array,race_id):
     df_2=pd.DataFrame(total_array)
     df_2.to_csv(path_1, index=False, header=False, encoding='utf-8-sig')
     print("csvに出力完了")
-
-if __name__ == "__main__":
-    # テスト用URL
-    load_url = "https://race.netkeiba.com/race/shutuba.html?race_id=202505021011"
-
-    # テスト用ダミーオッズ配列
-    # 形式： [馬番, 単勝オッズ, 複勝最小オッズ, 複勝最大オッズ, 人気]
-    # 馬番 1 と 2 のデータを例示
-    marge_cach = [
-        [1, 3.4, 1.8, 2.6, 2],
-        [2, 5.0, 2.2, 3.1, 5],
-    ]
-
-    main(load_url, marge_cach)
